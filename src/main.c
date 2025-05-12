@@ -6,6 +6,7 @@ typedef struct Word{
     char letter;
     int position;
     struct Word *next;
+    struct Word *ant;
 } Word;
 
 
@@ -14,7 +15,7 @@ void geminiWordGenerator(Word **head, Word **tail);
 
 // CRIA QUANTIDADE DE NÓS NECESSÁRIAS NA LISTA DO JOGADOR COM CHARS VAZIOS PARA ARMAZENAR ONDE
 // ESTÁ CADA PALAVRA ADIVINHADA PELO JOGADOR.
-void createPlayerList(Word *head_pilha_word, Word **tail_player);
+void createPlayerList(Word *head_pilha_word, Word **tail_player, int lenght);
 
 // CHECA SE PALAVRA ADIVINHADA PELO JOGADOR == A DO GEMINI (ESTAO NO MESMO INDEX)
 int checkLetter(Word **head_gemini, Word **head_player){
@@ -68,4 +69,27 @@ void addLetterPlayerList(Word **head_player, int index, char letter){
     }
 
     aux->letter = letter;
+}
+
+void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght){
+    Word *anterior = NULL;
+
+    for (int i = 0; i < lenght; i++){
+        Word *novo = (Word*)malloc(sizeof(Word));
+        if (novo){
+            novo->letra = '\0';
+            novo->position = i+1;
+            novo->ant = anterior;
+            novo->position = NULL;
+
+            if (anterior != NULL){
+                anterior->next = novo;
+            }
+            else{
+                *headPlayer = novo;
+            }
+            anterior = novo;
+        }
+    }
+    *tailPlayer = anterior;
 }
