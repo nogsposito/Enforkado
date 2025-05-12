@@ -15,7 +15,7 @@ void geminiWordGenerator(Word **head, Word **tail);
 
 // CRIA QUANTIDADE DE NÓS NECESSÁRIAS NA LISTA DO JOGADOR COM CHARS VAZIOS PARA ARMAZENAR ONDE
 // ESTÁ CADA PALAVRA ADIVINHADA PELO JOGADOR.
-void createPlayerList(Word *head_pilha_word, Word **tail_player, int lenght);
+void createPlayerList(Word **headPlayer, Word **tail_player, int lenght);
 
 // CHECA SE PALAVRA ADIVINHADA PELO JOGADOR == A DO GEMINI (ESTAO NO MESMO INDEX)
 int checkLetter(Word **head_gemini, Word **head_player){
