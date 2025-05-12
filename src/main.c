@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "raylib.h"
 
 typedef struct Word{
     char letter;
@@ -7,6 +8,7 @@ typedef struct Word{
     struct Word *next;
     struct Word *before;
 } Word;
+
 
 // ADICIONA EM LISTA ENCADEADA AS LETRAS DA STRING GERADA POR GEMINI
 void geminiWordGenerator(Word **head, Word **tail){}
@@ -34,6 +36,16 @@ void startGame();
 
 void endGame();
 
-int main(){
+int main() {
+    InitWindow(800, 600, "Teste Raylib");
+
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+        DrawText("Hello, Raylib!", 300, 280, 20, BLACK);
+        EndDrawing();
+    }
+
+    CloseWindow();
     return 0;
 }
