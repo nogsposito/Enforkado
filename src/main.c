@@ -27,5 +27,9 @@ void addLetterPlayerList(Word **head_player, int index){}
 // ADICIONA LETRA EM PILHA (DE PALAVRAS ADIVINHADAS POR JOGADOR)
 void addPilha(Word **head_pilha){}
 
-// REORGANIZA ORDEM ALFABETICA NA PILHA DE PALAVRAS ADICIONADAS PELO JOGADOR
+// REORGANIZA EM ORDEM ALFABETICA NA PILHA DE PALAVRAS ADICIONADAS PELO JOGADOR
 void bubblesort(Word **head_pilha){}
+
+void startGame();
+
+void endGame();
