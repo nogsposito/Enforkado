@@ -77,7 +77,7 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght){
     for (int i = 0; i < lenght; i++){
         Word *novo = (Word*)malloc(sizeof(Word));
         if (novo){
-            novo->letra = '\0';
+            novo->letter = '\0';
             novo->position = i+1;
             novo->ant = anterior;
             novo->position = NULL;
