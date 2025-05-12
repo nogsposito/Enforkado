@@ -18,7 +18,17 @@ void createPlayerList(Word *head_pilha_word, Word **tail_player);
 
 // CHECA SE PALAVRA ADIVINHADA PELO JOGADOR == A DO GEMINI (ESTAO NO MESMO INDEX)
 int checkLetter(Word **head_gemini, Word **head_player){
-    // ADAPTAR PARA BOOLEAN (1 ou 0)
+    Word *g = *head_gemini;
+    Word *p = *head_player;
+
+    while (g != NULL && p != NULL) {
+        if (g->letter != p->letter) {
+            return 0;
+        }
+        g = g->next;
+        p = p->next;
+    }
+
     return 1;
 }
 
