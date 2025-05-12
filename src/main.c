@@ -33,3 +33,7 @@ void bubblesort(Word **head_pilha){}
 void startGame();
 
 void endGame();
+
+int main(){
+    return 0;
+}
