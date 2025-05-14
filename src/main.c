@@ -39,7 +39,7 @@ void addLetterPlayerList(Word **head_player, int index, char letter);
 // ADICIONA LETRA EM PILHA (DE PALAVRAS ADIVINHADAS POR JOGADOR)
 void addPilha(Word **head_pilha);
 
-// REORGANIZA EM ORDEM ALFABETICA NA PILHA DE PALAVRAS ADICIONADAS PELO JOGADOR
+// REORGANIZA EM ORDEM ALFABETICA NA PILHA DE PALAVRAS ADICIONADAS PELO JOGADOR null
 void bubblesort(Word **head_pilha);
 
 void startGame();
@@ -80,7 +80,7 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght){
             novo->letter = '\0';
             novo->position = i+1;
             novo->ant = anterior;
-            novo->position = NULL;
+            novo->next = NULL;
 
             if (anterior != NULL){
                 anterior->next = novo;
