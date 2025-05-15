@@ -21,6 +21,7 @@ void geminiWordGenerator(Word **headGemini, Word **tailGemini);
 
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 bool isPlayerListCorrect(Word *headGemini, Word *headPlayer);
+bool checkLetterInStack(NodeStack *headStack, char letter);
 int checkLetter(Word *headGemini, char letter);
 void addPlayerList(Word **headPlayer, int index, char letter);
 void push(NodeStack **headStack, char letter);
@@ -101,9 +102,14 @@ int main() {
         if(checkLetter(headGemini, letter) != 0) {
             addPlayerList(&headPlayer, checkLetter(headGemini, letter), letter);
         } else {
-            push(&headStack, letter);
-            insertionSort(&headStack);
-            lives--;
+            if (!checkLetterInStack(headStack, letter)) {
+                push(&headStack, letter);
+                insertionSort(&headStack);
+                lives--;
+            }
+            else {
+                printf("Você já errou essa letra antes");
+            }
         }
     }
 
@@ -167,6 +173,7 @@ int checkLetter(Word *headGemini, char letter) {
     return 0;
 }
 
+
 void addPlayerList(Word **headPlayer, int index, char letter) {
     if(*headPlayer != NULL) {
         Word *aux = *headPlayer;
@@ -206,6 +213,17 @@ void push(NodeStack **headStack, char letter){
         *headStack = new;
     }
 }
+
+bool checkLetterInStack(NodeStack *headStack, char letter) {
+    while (headStack != NULL) {
+        if (headStack->letter == letter) {
+            return true;
+        }
+        headStack = headStack->next;
+    }
+    return false;
+}
+
 
 void insertionSort(NodeStack **head) {
     if(*head != NULL) {
