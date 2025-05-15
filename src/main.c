@@ -4,9 +4,9 @@
 
 typedef struct Word{
     char letter;
-    int position;
+    int index;
     struct Word *next;
-    struct Word *ant;
+    struct Word *prev;
 } Word;
 
 
@@ -64,7 +64,7 @@ int main() {
 void addLetterPlayerList(Word **head_player, int index, char letter){
     Word *aux = *head_player;
 
-    while(aux->position != index){
+    while(aux->index != index){
         aux= aux->next;
     }
 
@@ -78,8 +78,8 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght){
         Word *novo = (Word*)malloc(sizeof(Word));
         if (novo){
             novo->letter = '\0';
-            novo->position = i+1;
-            novo->ant = anterior;
+            novo->index = i+1;
+            novo->prev = anterior;
             novo->next = NULL;
 
             if (anterior != NULL){
