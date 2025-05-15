@@ -9,27 +9,19 @@ typedef struct Word{
     struct Word *prev;
 } Word;
 
+typedef struct NodeStack{
+    char letter;
+    struct NodeStack *next;
+} NodeStack;
+
 // ADICIONA EM LISTA ENCADEADA AS LETRAS DA STRING GERADA POR GEMINI
 void geminiWordGenerator(Word **headGemini, Word **tailGemini);
 
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 int checkLetter(Word *headGemini, char letter);
 void addPlayerList(Word **headPlayer, int index, char letter);
+void push(NodeStack **headStack, char letter);
 
-// ADICIONA LETRA EM PILHA (DE PALAVRAS ADIVINHADAS POR JOGADOR)
-void addPilha(Word **head_pilha, char letter){
-
-    Word *new = (Word*)malloc(sizeof(Word));
-
-    if (new == NULL) return;
-
-    new->letter = letter;
-    new->next = *head_pilha;
-    (*head_pilha)->prev = new;
-    new->prev = NULL;
-    *head_pilha = new; // só isso (pilha)?
-
-}
 
 // REORGANIZA EM ORDEM ALFABETICA NA PILHA DE PALAVRAS ADICIONADAS PELO JOGADOR null
 void bubblesort(Word **head_pilha, int tamanho){
@@ -120,5 +112,15 @@ void addPlayerList(Word **headPlayer, int index, char letter) {
         if(aux->index == index) {
             aux->letter = letter;
         }
+    }
+}
+
+void push(NodeStack **headStack, char letter){
+    NodeStack *new = (NodeStack*)malloc(sizeof(NodeStack));
+
+    if (new != NULL) {
+        new->letter = letter;
+        new->next = *headStack;
+        *headStack = new;
     }
 }
