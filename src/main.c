@@ -122,7 +122,7 @@ int main() {
                 lives--;
             }
             else {
-                printf("Você já errou essa letra antes");
+                printf("Voce ja errou essa letra antes");
             }
         }
     }
