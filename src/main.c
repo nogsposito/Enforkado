@@ -12,6 +12,7 @@ typedef struct Word{
 typedef struct NodeStack{
     char letter;
     struct NodeStack *next;
+    struct NodeStack *prev;
 } NodeStack;
 
 // ADICIONA EM LISTA ENCADEADA AS LETRAS DA STRING GERADA POR GEMINI
@@ -21,34 +22,7 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 int checkLetter(Word *headGemini, char letter);
 void addPlayerList(Word **headPlayer, int index, char letter);
 void push(NodeStack **headStack, char letter);
-
-
-// REORGANIZA EM ORDEM ALFABETICA NA PILHA DE PALAVRAS ADICIONADAS PELO JOGADOR null
-void bubblesort(Word **head_pilha, int tamanho){
-    int n = 1;
-    int troca = 1;
-    while (n <= tamanho && troca == 1){
-        troca = 0;
-        Word *aux= *head_pilha;
-        for (int i = 0; i < (tamanho - 1); i++){
-            /* code  bubble sort em pilha?*/
-        }
-        
-    }
-};
-
-int tamanho(Word **head_pilha){
-
-    Word *aux = *head_pilha;
-    int count = 0;
-
-    while (aux != NULL){
-        count++;
-        aux = aux->next;
-    }
-    
-    return count;
-}
+void insertionSort(NodeStack **headStack);
 
 int main() {
     InitWindow(800, 600, "Teste Raylib");
@@ -118,9 +92,36 @@ void addPlayerList(Word **headPlayer, int index, char letter) {
 void push(NodeStack **headStack, char letter){
     NodeStack *new = (NodeStack*)malloc(sizeof(NodeStack));
 
-    if (new != NULL) {
+    if(new != NULL) {
         new->letter = letter;
         new->next = *headStack;
+        new->prev = NULL;
+
+        if(*headStack != NULL) {
+            (*headStack)->prev = new;
+        }
+        
         *headStack = new;
     }
+}
+
+void insertionSort(NodeStack **headStack) {
+    if(*headStack != NULL) {
+        NodeStack *aux1 = (*headStack)->next;
+
+        while(aux1 != NULL) { 
+            NodeStack *aux2 = aux1;
+
+            while(aux2 != *headStack && aux2->letter < aux2->prev->letter) {
+                char c = aux2->letter;
+
+                aux2->letter = aux2->prev->letter;
+                aux2->prev->letter = c;
+
+                aux2 = aux2->prev;
+            }
+
+            aux1 = aux1->next;
+        }
+    } 
 }
