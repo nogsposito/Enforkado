@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "raylib.h"
 
 typedef struct Word{
@@ -19,10 +20,37 @@ typedef struct NodeStack{
 void geminiWordGenerator(Word **headGemini, Word **tailGemini);
 
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
+bool isPlayerListCorrect(Word *headGemini, Word *headPlayer);
 int checkLetter(Word *headGemini, char letter);
 void addPlayerList(Word **headPlayer, int index, char letter);
 void push(NodeStack **headStack, char letter);
-void insertionSort(NodeStack **headStack);
+void insertionSort(NodeStack **head);
+
+void addGeminiList(Word **headGemini, Word **tailGemini, int index, char letter) {
+    Word *new = (Word*)malloc(sizeof(Word));
+
+    if(new != NULL) {
+        new->index = index;
+        new->letter = letter;               
+        new->next = NULL;
+        new->prev = *tailGemini;
+
+        if(*headGemini == NULL) {
+            *headGemini = new;
+        } else {
+            (*tailGemini)->next = new;
+        }
+
+        *tailGemini = new;
+    }
+}
+
+void printPilha(NodeStack *head){ 
+	while(head != NULL) {
+		printf("%c-> ", head->letter);
+		head = head->next;
+	}
+}
 
 int main() {
     InitWindow(800, 600, "Teste Raylib");
@@ -35,7 +63,57 @@ int main() {
     }
 
     CloseWindow();
-    
+
+    /*
+    printf("Bem vindo ao Enforkado!\n");
+    printf("Seu objetivo e acertar o ingrediente secreto\n");
+
+    Word *headGemini = NULL;
+    Word *tailGemini = NULL;
+
+    Word *headPlayer = NULL;
+    Word *tailPlayer = NULL;
+
+    int lives = 5;
+
+    NodeStack *headStack = NULL;
+
+    addGeminiList(&headGemini, &tailGemini, 1, 'Q');
+    addGeminiList(&headGemini, &tailGemini, 2, 'U');
+    addGeminiList(&headGemini, &tailGemini, 3, 'E');
+    addGeminiList(&headGemini, &tailGemini, 4, 'I');
+    addGeminiList(&headGemini, &tailGemini, 5, 'J');
+    addGeminiList(&headGemini, &tailGemini, 6, 'O');
+
+    createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
+
+    while(!isPlayerListCorrect(headGemini, headPlayer) && lives != 0) {
+        char letter;
+
+        printf("\n%c %c %c %c %c %c\n", headPlayer->letter, headPlayer->next->letter, headPlayer->next->next->letter, headPlayer->next->next->next->letter, headPlayer->next->next->next->next->letter, headPlayer->next->next->next->next->next->letter);
+        printf("Letras tentadas:");
+        printPilha(headStack);
+        printf("\nVidas: %d\n", lives);
+
+        //Esse espaço antes é importante
+        scanf(" %c", &letter);
+
+        if(checkLetter(headGemini, letter) != 0) {
+            addPlayerList(&headPlayer, checkLetter(headGemini, letter), letter);
+        } else {
+            push(&headStack, letter);
+            insertionSort(&headStack);
+            lives--;
+        }
+    }
+
+    if(isPlayerListCorrect(headGemini, headPlayer)) {
+        printf("Voce acertou!");
+    } else if(lives == 0) {
+        printf("Suas vidas acabaram!");
+    }
+    */
+
     return 0;
 }
 
@@ -45,8 +123,8 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
             Word *new = (Word*)malloc(sizeof(Word));
 
             if(new != NULL) {
-                new->letter = '\0';
                 new->index = i+1;
+                new->letter = '\0';               
                 new->next = NULL;
                 new->prev = *tailPlayer;
 
@@ -60,6 +138,19 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
             }
         }
     }
+}
+
+bool isPlayerListCorrect(Word *headGemini, Word *headPlayer) {
+    if(headGemini != NULL && headPlayer != NULL) {
+        while(headGemini != NULL && headPlayer != NULL && headGemini->letter == headPlayer->letter) {
+            headGemini = headGemini->next;
+            headPlayer = headPlayer->next;
+        }
+
+        return headGemini == NULL && headPlayer == NULL;
+    }
+
+    return false;
 }
 
 int checkLetter(Word *headGemini, char letter) {
@@ -106,14 +197,14 @@ void push(NodeStack **headStack, char letter){
     }
 }
 
-void insertionSort(NodeStack **headStack) {
-    if(*headStack != NULL) {
-        NodeStack *aux1 = (*headStack)->next;
+void insertionSort(NodeStack **head) {
+    if(*head != NULL) {
+        NodeStack *aux1 = (*head)->next;
 
         while(aux1 != NULL) { 
             NodeStack *aux2 = aux1;
 
-            while(aux2 != *headStack && aux2->letter < aux2->prev->letter) {
+            while(aux2 != *head && aux2->letter < aux2->prev->letter) {
                 char c = aux2->letter;
 
                 aux2->letter = aux2->prev->letter;
