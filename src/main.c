@@ -27,6 +27,7 @@ int checkLetter(Word *headGemini, char letter);
 void addPlayerList(Word **headPlayer, int index, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
+char to_uppercase(char letter);
 
 void addGeminiList(Word **head, Word **tail, const char *prompt){
     
@@ -65,6 +66,13 @@ void printPilha(NodeStack *head){
 		printf("%c ", head->letter);
 		head = head->next;
 	}
+}
+
+char to_uppercase(char letter) {
+    if (letter >= 'a' && letter <= 'z') {
+        return letter - 32;
+    }
+    return letter;
 }
 
 int main() {
@@ -112,6 +120,8 @@ int main() {
 
         //Esse espaço antes é importante
         scanf(" %c", &letter);
+        letter = to_uppercase(letter);
+
 
         if(checkLetter(headGemini, letter) != 0) {
             addPlayerList(&headPlayer, checkLetter(headGemini, letter), letter);
