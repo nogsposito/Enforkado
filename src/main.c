@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "raylib.h"
 
 typedef struct Word{
@@ -10,8 +11,10 @@ typedef struct Word{
 } Word;
 
 // ADICIONA EM LISTA ENCADEADA AS LETRAS DA STRING GERADA POR GEMINI
-void geminiWordGenerator(Word **head, Word **tail);
+void geminiWordGenerator(Word **headGemini, Word **tailGemini);
+
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
+bool checkLetter(Word *headGemini, char letter);
 
 // ADICIONAR EM INDEX A PALAVRA ADIVINHADA PELO JOGADOR
 void addLetterPlayerList(Word **head_player, int index, char letter);
@@ -89,8 +92,8 @@ int main() {
     return 0;
 }
 
-void createPlayerList(Word **head, Word **tail, int lenght) {
-    if(*head == NULL && *tail == NULL) {
+void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
+    if(*headPlayer == NULL && *tailPlayer == NULL) {
         for(int i = 0; i < lenght; i++) {
             Word *new = (Word*)malloc(sizeof(Word));
 
@@ -98,31 +101,30 @@ void createPlayerList(Word **head, Word **tail, int lenght) {
                 new->letter = '\0';
                 new->index = i+1;
                 new->next = NULL;
-                new->prev = *tail;
+                new->prev = *tailPlayer;
 
-                if(*head == NULL) {
-                    *head = new;
+                if(*headPlayer == NULL) {
+                    *headPlayer = new;
                 } else {
-                    (*tail)->next = new;
+                    (*tailPlayer)->next = new;
                 }
 
-                *tail = new;
+                *tailPlayer = new;
             }
         }
     }
 }
 
-int checkLetter(Word **head_gemini, Word **head_player) {
-    Word *g = *head_gemini;
-    Word *p = *head_player;
-
-    while (g != NULL && p != NULL) {
-        if (g->letter != p->letter) {
-            return 0;
+bool checkLetter(Word *headGemini, char letter) {
+    if(headGemini != NULL) {
+        while(headGemini->letter != letter && headGemini->next != NULL) {
+            headGemini = headGemini->next;
         }
-        g = g->next;
-        p = p->next;
+
+        if(headGemini->letter == letter) {
+            return true;
+        }
     }
 
-    return 1;
+    return false;
 }
