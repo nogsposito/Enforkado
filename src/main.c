@@ -48,7 +48,7 @@ void addGeminiList(Word **headGemini, Word **tailGemini, int index, char letter)
 
 void printPilha(NodeStack *head){ 
 	while(head != NULL) {
-		printf("%c-> ", head->letter);
+		printf("%c ", head->letter);
 		head = head->next;
 	}
 }
