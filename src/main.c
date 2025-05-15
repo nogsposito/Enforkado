@@ -182,6 +182,13 @@ void addPlayerList(Word **headPlayer, int index, char letter) {
 }
 
 void push(NodeStack **headStack, char letter){
+  NodeStack *aux = *headStack;
+    while (aux) {
+        if (aux->letter == letter) {
+            return;
+        }
+        aux = aux->next;
+    }
     NodeStack *new = (NodeStack*)malloc(sizeof(NodeStack));
 
     if(new != NULL) {
