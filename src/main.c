@@ -27,22 +27,35 @@ void addPlayerList(Word **headPlayer, int index, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
 
-void addGeminiList(Word **headGemini, Word **tailGemini, int index, char letter) {
-    Word *new = (Word*)malloc(sizeof(Word));
+void addGeminiList(Word **head, Word **tail, const char *prompt){
+    
+    char palavra[51];
+    strcpy(palavra, prompt);
 
-    if(new != NULL) {
-        new->index = index;
-        new->letter = letter;               
-        new->next = NULL;
-        new->prev = *tailGemini;
+    int i = 0;
+    
+    while (palavra[i] != '\0'){
 
-        if(*headGemini == NULL) {
-            *headGemini = new;
-        } else {
-            (*tailGemini)->next = new;
+        if (palavra[i] == '\\' && palavra[i+1] == 'n'){
+            break;
         }
 
-        *tailGemini = new;
+        Word *novo = (Word*)malloc(sizeof(Word));
+        if (novo == NULL) return;
+
+        novo->letter = palavra[i];
+        novo->index = i+1;
+
+        if (*head == NULL){
+            *head = novo;
+            *tail = novo;
+            novo->prev = NULL;
+        } else {
+            (*tail)->next = novo;
+            novo->prev = *tail;
+            *tail = novo;
+        }
+        i++;
     }
 }
 
