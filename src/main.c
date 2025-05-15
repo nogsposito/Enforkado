@@ -9,29 +9,9 @@ typedef struct Word{
     struct Word *prev;
 } Word;
 
-
 // ADICIONA EM LISTA ENCADEADA AS LETRAS DA STRING GERADA POR GEMINI
 void geminiWordGenerator(Word **head, Word **tail);
-
-// CRIA QUANTIDADE DE NÓS NECESSÁRIAS NA LISTA DO JOGADOR COM CHARS VAZIOS PARA ARMAZENAR ONDE
-// ESTÁ CADA PALAVRA ADIVINHADA PELO JOGADOR.
-void createPlayerList(Word **headPlayer, Word **tail_player, int lenght);
-
-// CHECA SE PALAVRA ADIVINHADA PELO JOGADOR == A DO GEMINI (ESTAO NO MESMO INDEX)
-int checkLetter(Word **head_gemini, Word **head_player){
-    Word *g = *head_gemini;
-    Word *p = *head_player;
-
-    while (g != NULL && p != NULL) {
-        if (g->letter != p->letter) {
-            return 0;
-        }
-        g = g->next;
-        p = p->next;
-    }
-
-    return 1;
-}
+void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 
 // ADICIONAR EM INDEX A PALAVRA ADIVINHADA PELO JOGADOR
 void addLetterPlayerList(Word **head_player, int index, char letter);
@@ -45,8 +25,8 @@ void addPilha(Word **head_pilha, char letter){
 
     new->letter = letter;
     new->next = *head_pilha;
-    (*head_pilha)->ant = new;
-    new->ant = NULL;
+    (*head_pilha)->prev = new;
+    new->prev = NULL;
     *head_pilha = new; // só isso (pilha)?
 
 }
@@ -93,37 +73,7 @@ void addLetterPlayerList(Word **head_player, int index, char letter){
     aux->letter = letter;
 }
 
-void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght){
-    Word *anterior = NULL;
 
-    for (int i = 0; i < lenght; i++){
-<<<<<<< HEAD
-        Word *novo = (Word*)malloc(sizeof(Word));
-        if (novo){
-            novo->letter = '\0';
-            novo->index = i+1;
-            novo->prev = anterior;
-            novo->next = NULL;
-=======
-        Word *new = (Word*)malloc(sizeof(Word));
-        if (new){
-            new->letter = '\0';
-            new->position = i+1;
-            new->ant = anterior;
-            new->next = NULL;
->>>>>>> cf9522c15e018fed4bc087f62aa5979d81f068d4
-
-            if (anterior != NULL){
-                anterior->next = new;
-            }
-            else{
-                *headPlayer = new;
-            }
-            anterior = new;
-        }
-    }
-    *tailPlayer = anterior;
-}
 
 int main() {
     InitWindow(800, 600, "Teste Raylib");
@@ -137,4 +87,42 @@ int main() {
 
     CloseWindow();
     return 0;
+}
+
+void createPlayerList(Word **head, Word **tail, int lenght) {
+    if(*head == NULL && *tail == NULL) {
+        for(int i = 0; i < lenght; i++) {
+            Word *new = (Word*)malloc(sizeof(Word));
+
+            if(new != NULL) {
+                new->letter = '\0';
+                new->index = i+1;
+                new->next = NULL;
+                new->prev = *tail;
+
+                if(*head == NULL) {
+                    *head = new;
+                } else {
+                    (*tail)->next = new;
+                }
+
+                *tail = new;
+            }
+        }
+    }
+}
+
+int checkLetter(Word **head_gemini, Word **head_player) {
+    Word *g = *head_gemini;
+    Word *p = *head_player;
+
+    while (g != NULL && p != NULL) {
+        if (g->letter != p->letter) {
+            return 0;
+        }
+        g = g->next;
+        p = p->next;
+    }
+
+    return 1;
 }
