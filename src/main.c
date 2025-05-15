@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include "raylib.h"
 
 typedef struct Word{
-    char letter;
     int index;
+    char letter;
     struct Word *next;
     struct Word *prev;
 } Word;
@@ -14,10 +13,8 @@ typedef struct Word{
 void geminiWordGenerator(Word **headGemini, Word **tailGemini);
 
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
-bool checkLetter(Word *headGemini, char letter);
-
-// ADICIONAR EM INDEX A PALAVRA ADIVINHADA PELO JOGADOR
-void addLetterPlayerList(Word **head_player, int index, char letter);
+int checkLetter(Word *headGemini, char letter);
+void addPlayerList(Word **headPlayer, int index, char letter);
 
 // ADICIONA LETRA EM PILHA (DE PALAVRAS ADIVINHADAS POR JOGADOR)
 void addPilha(Word **head_pilha, char letter){
@@ -61,23 +58,6 @@ int tamanho(Word **head_pilha){
     return count;
 }
 
-void startGame();
-
-void endGame();
-
-
-void addLetterPlayerList(Word **head_player, int index, char letter){
-    Word *aux = *head_player;
-
-    while(aux->index != index){
-        aux= aux->next;
-    }
-
-    aux->letter = letter;
-}
-
-
-
 int main() {
     InitWindow(800, 600, "Teste Raylib");
 
@@ -115,16 +95,30 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
     }
 }
 
-bool checkLetter(Word *headGemini, char letter) {
+int checkLetter(Word *headGemini, char letter) {
     if(headGemini != NULL) {
         while(headGemini->letter != letter && headGemini->next != NULL) {
             headGemini = headGemini->next;
         }
 
         if(headGemini->letter == letter) {
-            return true;
+            return headGemini->index;
         }
     }
 
-    return false;
+    return 0;
+}
+
+void addPlayerList(Word **headPlayer, int index, char letter) {
+    if(*headPlayer != NULL) {
+        Word *aux = *headPlayer;
+
+        while(aux->index != index && aux->next != NULL) {
+            aux= aux->next;
+        }
+
+        if(aux->index == index) {
+            aux->letter = letter;
+        }
+    }
 }
