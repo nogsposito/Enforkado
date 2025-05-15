@@ -119,6 +119,7 @@ int main() {
         printf("\nVidas: %d\n", lives);
 
         //Esse espaço antes é importante
+        scanf("Digite um letra: ")
         scanf(" %c", &letter);
         letter = to_uppercase(letter);
 
