@@ -144,7 +144,7 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
 
             if(new != NULL) {
                 new->index = i+1;
-                new->letter = '\0';               
+                new->letter = '_';               
                 new->next = NULL;
                 new->prev = *tailPlayer;
 
