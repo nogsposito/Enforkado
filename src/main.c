@@ -37,28 +37,50 @@ int checkLetter(Word **head_gemini, Word **head_player){
 void addLetterPlayerList(Word **head_player, int index, char letter);
 
 // ADICIONA LETRA EM PILHA (DE PALAVRAS ADIVINHADAS POR JOGADOR)
-void addPilha(Word **head_pilha);
+void addPilha(Word **head_pilha, char letter){
+
+    Word *new = (Word*)malloc(sizeof(Word));
+
+    if (new == NULL) return;
+
+    new->letter = letter;
+    new->next = *head_pilha;
+    (*head_pilha)->ant = new;
+    new->ant = NULL;
+    *head_pilha = new; // só isso (pilha)?
+
+}
 
 // REORGANIZA EM ORDEM ALFABETICA NA PILHA DE PALAVRAS ADICIONADAS PELO JOGADOR null
-void bubblesort(Word **head_pilha);
+void bubblesort(Word **head_pilha, int tamanho){
+    int n = 1;
+    int troca = 1;
+    while (n <= tamanho && troca == 1){
+        troca = 0;
+        Word *aux= *head_pilha;
+        for (int i = 0; i < (tamanho - 1); i++){
+            /* code  bubble sort em pilha?*/
+        }
+        
+    }
+};
+
+int tamanho(Word **head_pilha){
+
+    Word *aux = *head_pilha;
+    int count = 0;
+
+    while (aux != NULL){
+        count++;
+        aux = aux->next;
+    }
+    
+    return count;
+}
 
 void startGame();
 
 void endGame();
-
-int main() {
-    InitWindow(800, 600, "Teste Raylib");
-
-    while (!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawText("Hello, Raylib!", 300, 280, 20, BLACK);
-        EndDrawing();
-    }
-
-    CloseWindow();
-    return 0;
-}
 
 
 void addLetterPlayerList(Word **head_player, int index, char letter){
@@ -75,21 +97,44 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght){
     Word *anterior = NULL;
 
     for (int i = 0; i < lenght; i++){
+<<<<<<< HEAD
         Word *novo = (Word*)malloc(sizeof(Word));
         if (novo){
             novo->letter = '\0';
             novo->index = i+1;
             novo->prev = anterior;
             novo->next = NULL;
+=======
+        Word *new = (Word*)malloc(sizeof(Word));
+        if (new){
+            new->letter = '\0';
+            new->position = i+1;
+            new->ant = anterior;
+            new->next = NULL;
+>>>>>>> cf9522c15e018fed4bc087f62aa5979d81f068d4
 
             if (anterior != NULL){
-                anterior->next = novo;
+                anterior->next = new;
             }
             else{
-                *headPlayer = novo;
+                *headPlayer = new;
             }
-            anterior = novo;
+            anterior = new;
         }
     }
     *tailPlayer = anterior;
+}
+
+int main() {
+    InitWindow(800, 600, "Teste Raylib");
+
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+        DrawText("Hello, Raylib!", 300, 280, 20, BLACK);
+        EndDrawing();
+    }
+
+    CloseWindow();
+    return 0;
 }
