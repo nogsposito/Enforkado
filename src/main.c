@@ -3,6 +3,12 @@
 #include <stdbool.h>
 #include <string.h>
 #include "raylib.h"
+#include <curl/curl.h>
+
+typedef struct {
+    char *buffer;
+    size_t size;
+} MemoryStruct;
 
 typedef struct Word{
     int index;
@@ -18,7 +24,6 @@ typedef struct NodeStack{
 } NodeStack;
 
 // ADICIONA EM LISTA ENCADEADA AS LETRAS DA STRING GERADA POR GEMINI
-void geminiWordGenerator(Word **headGemini, Word **tailGemini);
 
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 bool isPlayerListCorrect(Word *headGemini, Word *headPlayer);
@@ -28,6 +33,92 @@ void addPlayerList(Word **headPlayer, int index, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
 char to_uppercase(char letter);
+
+static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+    size_t realsize = size * nmemb;
+    MemoryStruct *mem = (MemoryStruct *)userp;
+
+    char *ptr = realloc(mem->buffer, mem->size + realsize + 1);
+    if (ptr == NULL) return 0;
+
+    mem->buffer = ptr;
+    memcpy(&(mem->buffer[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->buffer[mem->size] = 0;
+
+    return realsize;
+}
+
+char* geminiWordGenerator(const char *prompt) {
+    CURL *curl;
+    CURLcode res;
+    MemoryStruct chunk;
+
+    chunk.buffer = malloc(1);
+    chunk.size = 0;
+
+    const char *api_key = "AIzaSyAwO9mHjyuJfKTHLZMfl2TLCeOS5oSPOHk";  // substitua aqui
+    const char *model = "gemini-1.5-flash-latest";
+
+    char url[512];
+    snprintf(url, sizeof(url), 
+        "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s",
+        model, api_key
+    );
+
+    char json_payload[1024];
+    snprintf(json_payload, sizeof(json_payload),
+        "{\"contents\":[{\"parts\":[{\"text\":\"%s\"}]}]}", prompt
+    );
+
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl = curl_easy_init();
+
+    if (curl) {
+        struct curl_slist *headers = NULL;
+        headers = curl_slist_append(headers, "Content-Type: application/json; charset=UTF-8");
+
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_payload);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK) {
+            fprintf(stderr, "Erro na requisição: %s\n", curl_easy_strerror(res));
+            free(chunk.buffer);
+            chunk.buffer = NULL;
+        }
+
+        curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
+    }
+
+    curl_global_cleanup();
+
+    if (chunk.buffer) {
+        char *start = strstr(chunk.buffer, "\"text\": \"");
+        if (start) {
+            start += strlen("\"text\": \"");
+            char *end = strchr(start, '"');
+            if (end) {
+                size_t len = end - start;
+                char *result = malloc(len + 1);
+                strncpy(result, start, len);
+                result[len] = '\0';
+                free(chunk.buffer);
+                return result;
+            }
+        }
+        free(chunk.buffer);
+    }
+
+    return NULL;
+}
 
 void addGeminiList(Word **head, Word **tail, const char *prompt){
     
@@ -76,12 +167,20 @@ char to_uppercase(char letter) {
 }
 
 int main() {
+
     InitWindow(800, 600, "Teste Raylib");
+
+    char *response = geminiWordGenerator("Retorne apenas um nome de receita, em uma única palavra, sem instruções, sem pontuação, sem caracteres especiais e sem espaços. Apenas uma palavra simples como 'Spaghetti', 'Feijoada' ou 'Tapioca'");
 
     while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        DrawText("Hello, Raylib!", 300, 280, 20, BLACK);
+        DrawText("Resposta do Gemini:", 20, 20, 20, DARKGRAY);
+        if (response) {
+            DrawText(response, 20, 60, 30, MAROON);
+        } else {
+            DrawText("Erro ao obter resposta!", 20, 60, 20, RED);
+        }
         EndDrawing();
     }
 

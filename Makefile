@@ -1,6 +1,6 @@
 CC = gcc
 SRC = src/main.c
-BIN = jogo
+BIN = bin/jogo
 CFLAGS = -lraylib -lm -ldl -lpthread -lGL -lrt -lX11 -lcurl
 
 all: $(BIN)
