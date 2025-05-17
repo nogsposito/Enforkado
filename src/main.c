@@ -105,29 +105,29 @@ int main() {
 
     NodeStack *headStack = NULL;
     char *response = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
-    colocarNoArray( ingredients, response);
+    colocarNoArray(ingredients, response);
     for(int i=0;i<NUM_PALAVRA;i++){
         addGeminiList(&headGemini, &tailGemini, ingredients[i]); //fazer um for do tamanho NUM_PALAVRAS que rode 10 vezes
-    createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
+        createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
 
-    while(!isPlayerListCorrect(headGemini, headPlayer) && lives != 0) {
-        char letter;
+        while(!isPlayerListCorrect(headGemini, headPlayer) && lives != 0) {
+            char letter;
 
-        printf("\n%c %c %c %c %c %c\n", headPlayer->letter, headPlayer->next->letter, headPlayer->next->next->letter, headPlayer->next->next->next->letter, headPlayer->next->next->next->next->letter, headPlayer->next->next->next->next->next->letter);
-        printf("Letras tentadas:");
-        printPilha(headStack);
-        printf("\nVidas: %d\n", lives);
+            printf("\n%c %c %c %c %c %c\n", headPlayer->letter, headPlayer->next->letter, headPlayer->next->next->letter, headPlayer->next->next->next->letter, headPlayer->next->next->next->next->letter, headPlayer->next->next->next->next->next->letter);
+            printf("Letras tentadas:");
+            printPilha(headStack);
+            printf("\nVidas: %d\n", lives);
 
-        //Esse espaço antes é importante
-        scanf("Digite um letra: ")
-        scanf(" %c", &letter);
-        letter = to_uppercase(letter);
+            //Esse espaço antes é importante
+            scanf("Digite um letra: ")
+            scanf(" %c", &letter);
+            letter = to_uppercase(letter);
 
 
-        if(checkLetter(headGemini, letter) != 0) {
+            if(checkLetter(headGemini, letter) != 0) {
             addPlayerList(&headPlayer, checkLetter(headGemini, letter), letter);
-        } else {
-            if (!checkLetterInStack(headStack, letter)) {
+            } else {
+                if (!checkLetterInStack(headStack, letter)) {
                 push(&headStack, letter);
                 insertionSort(&headStack);
                 lives--;
@@ -143,6 +143,8 @@ int main() {
     } else if(lives == 0) {
         printf("Suas vidas acabaram!");
     }
+    }
+    
     */
     return 0;
 }
