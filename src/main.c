@@ -108,7 +108,6 @@ int main() {
     colocarNoArray( ingredients, response);
     for(int i=0;i<NUM_PALAVRA;i++){
         addGeminiList(&headGemini, &tailGemini, ingredients[i]); //fazer um for do tamanho NUM_PALAVRAS que rode 10 vezes
-
     createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
 
     while(!isPlayerListCorrect(headGemini, headPlayer) && lives != 0) {
@@ -145,7 +144,7 @@ int main() {
         printf("Suas vidas acabaram!");
     }
     */
-       return 0;
+    return 0;
 }
     
 
