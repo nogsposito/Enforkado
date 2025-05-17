@@ -44,22 +44,6 @@ void printPilha(NodeStack *head);
 
 int main() {
 
-    char palavras[MAX_PALAVRAS][TAM_PALAVRA] = {{0}};
-    char *response = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
-
-    if (response != NULL) {
-        int i = 0;
-        char *token = strtok(response, " ");
-        while (token != NULL && i < MAX_PALAVRAS) {
-            strncpy(palavras[i], token, TAM_PALAVRA - 1);
-            palavras[i][TAM_PALAVRA - 1] = '\0';
-            i++;
-            token = strtok(NULL, " ");
-        }
-        free(response);
-    }
-
-
     const int largura = 800;
     const int altura = 600;
 
@@ -67,44 +51,6 @@ int main() {
     GameScreen telaAtual = MENU;
     Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
 
-    // tbm fazer ele retornar o nome da receita em si e mostrar no final a receita que o user fez?
-
-    while (!WindowShouldClose()) {
-
-        if (telaAtual == MENU){
-            if (CheckCollisionPointRec(GetMousePosition(), botao) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-                telaAtual = FASE;
-            } // apertar botao para fase
-        }
-
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        if (telaAtual == MENU){
-
-            DrawText("Seja bem vindo ao Enforkado!", 20, 160, 20, DARKGRAY);
-            
-            DrawRectangleRec(botao, LIGHTGRAY);
-            if (CheckCollisionPointRec(GetMousePosition(), botao)) {
-                DrawRectangleLinesEx(botao, 2, RED);
-            } else {
-                DrawRectangleLinesEx(botao, 2, BLACK);
-            }
-
-            DrawText("Começar", largura / 2 - MeasureText("Começar", 20) / 2, altura / 2 - 10, 20, BLACK);
-        } else if (telaAtual == FASE){
-            DrawText("Resposta do Gemini:", 20, 20, 20, DARKGRAY);
-            if (response) {
-                DrawText(response, 20, 60, 30, MAROON);
-            } else {
-                DrawText("Erro ao obter resposta!", 50, 60, 20, RED);
-            }
-        }
-        
-        EndDrawing();
-    }
-
-    CloseWindow();
 
     /*
     printf("Bem vindo ao Enforkado!\n");
