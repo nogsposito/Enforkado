@@ -23,6 +23,8 @@ typedef struct NodeStack{
     struct NodeStack *prev;
 } NodeStack;
 
+typedef enum { MENU, FASE, GAMEOVER } GameScreen;
+
 // ADICIONA EM LISTA ENCADEADA AS LETRAS DA STRING GERADA POR GEMINI
 
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
@@ -168,19 +170,47 @@ char to_uppercase(char letter) {
 
 int main() {
 
-    InitWindow(800, 600, "Teste Raylib");
+    const int largura = 800;
+    const int altura = 600;
 
-    char *response = geminiWordGenerator("Retorne apenas um nome de receita, em uma única palavra, sem instruções, sem pontuação, sem caracteres especiais e sem espaços. Apenas uma palavra simples como 'Spaghetti', 'Feijoada' ou 'Tapioca'");
+    InitWindow(largura, altura, "Jogo");
+    GameScreen telaAtual = MENU;
+    Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
+
+    char *response = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita");
 
     while (!WindowShouldClose()) {
+
+        if (telaAtual == MENU){
+            if (CheckCollisionPointRec(GetMousePosition(), botao) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                telaAtual = FASE;
+            } // apertar botao para fase
+        }
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        DrawText("Resposta do Gemini:", 20, 20, 20, DARKGRAY);
-        if (response) {
-            DrawText(response, 20, 60, 30, MAROON);
-        } else {
-            DrawText("Erro ao obter resposta!", 20, 60, 20, RED);
+
+        if (telaAtual == MENU){
+
+            DrawText("Seja bem vindo ao Enforkado!", 20, 160, 20, DARKGRAY);
+            
+            DrawRectangleRec(botao, LIGHTGRAY);
+            if (CheckCollisionPointRec(GetMousePosition(), botao)) {
+                DrawRectangleLinesEx(botao, 2, RED);
+            } else {
+                DrawRectangleLinesEx(botao, 2, BLACK);
+            }
+
+            DrawText("Começar", largura / 2 - MeasureText("Começar", 20) / 2, altura / 2 - 10, 20, BLACK);
+        } else if (telaAtual == FASE){
+            DrawText("Resposta do Gemini:", 20, 20, 20, DARKGRAY);
+            if (response) {
+                DrawText(response, 20, 60, 30, MAROON);
+            } else {
+                DrawText("Erro ao obter resposta!", 50, 60, 20, RED);
+            }
         }
+        
         EndDrawing();
     }
 
