@@ -423,3 +423,18 @@ void insertionSort(NodeStack **head) {
     } 
 }
 
+void colocarNoArray(char *palavras[NUM_PALAVRAS], char *ingredients) {
+    int i = 0;
+    char *token = strtok(ingredients, " ");
+    
+    while (token != NULL && i < NUM_PALAVRAS) {
+        palavras[i] = malloc(strlen(token) + 1);
+        if (palavras[i] == NULL) {
+            fprintf(stderr, "Erro ao alocar memória.\n");
+            exit(1); 
+        }
+        strcpy(palavras[i], token);
+        i++;
+        token = strtok(NULL, " ");
+    }
+}
