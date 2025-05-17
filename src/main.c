@@ -109,8 +109,7 @@ int main() {
                 int *indexes = checkLetter(headGemini, letra);
                 if (indexes != NULL && indexes[0] != -1) {
                     addPlayerList(&headPlayer, indexes, letra);
-                }
-                else {
+                } else {
                     if (!checkLetterInStack(headStack, letra)) {
                         push(&headStack, letra);
                         insertionSort(&headStack);
@@ -123,18 +122,93 @@ int main() {
             if (isPlayerListCorrect(headGemini, headPlayer)) {
                 palavraCompleta = true;
                 DrawText("Voce acertou!", 20, 300, 30, DARKGREEN);
+                DrawText("Pressione ENTER para continuar", 20, 340, 20, DARKGRAY);
+
+                // Aguarda a tecla ENTER para avançar para a próxima palavra
+                if (IsKeyPressed(KEY_ENTER)) {
+                    // Libera as listas atuais
+                    Word *temp = headGemini;
+                    while (temp != NULL) {
+                        Word *next = temp->next;
+                        free(temp);
+                        temp = next;
+                    }
+                    headGemini = NULL;
+                    tailGemini = NULL;
+
+                    temp = headPlayer;
+                    while (temp != NULL) {
+                        Word *next = temp->next;
+                        free(temp);
+                        temp = next;
+                    }
+                    headPlayer = NULL;
+                    tailPlayer = NULL;
+
+                    NodeStack *tempStack = headStack;
+                    while (tempStack != NULL) {
+                        NodeStack *next = tempStack->next;
+                        free(tempStack);
+                        tempStack = next;
+                    }
+                    headStack = NULL;
+
+                    // Avança para a próxima palavra
+                    palavraAtual++;
+                    if (palavraAtual < NUM_PALAVRAS && ingredientes[palavraAtual] != NULL) {
+                        // Reinicia o estado do jogo
+                        addGeminiList(&headGemini, &tailGemini, ingredientes[palavraAtual]);
+                        createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
+                        vidas = 5;
+                        palavraCompleta = false;
+                    } else {
+                        // Todas as palavras foram completadas
+                        telaAtual = GAMEOVER;
+                    }
+                }
             } else if (vidas == 0) {
                 DrawText("Suas vidas acabaram!", 20, 300, 30, MAROON);
+                DrawText("Pressione ENTER para continuar", 20, 340, 20, DARKGRAY);
+                // Aguarda a tecla ENTER para ir para GAMEOVER
+                if (IsKeyPressed(KEY_ENTER)) {
+                    telaAtual = GAMEOVER;
+                }
             }
+        } else if (telaAtual == GAMEOVER) {
+            DrawText("Fim de Jogo!", 20, 300, 30, MAROON);
+            DrawText("Pressione ESC para sair", 20, 350, 20, DARKGRAY);
         }
 
         EndDrawing();
     }
 
+    // Libera memória restante
+    Word *temp = headGemini;
+    while (temp != NULL) {
+        Word *next = temp->next;
+        free(temp);
+        temp = next;
+    }
+    temp = headPlayer;
+    while (temp != NULL) {
+        Word *next = temp->next;
+        free(temp);
+        temp = next;
+    }
+    NodeStack *tempStack = headStack;
+    while (tempStack != NULL) {
+        NodeStack *next = tempStack->next;
+        free(tempStack);
+        tempStack = next;
+    }
+    for (int i = 0; i < NUM_PALAVRAS; i++) {
+        if (ingredientes[i] != NULL) free(ingredientes[i]);
+    }
+    if (resposta != NULL) free(resposta);
+
     CloseWindow();
     return 0;
 }
-
     
 
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
