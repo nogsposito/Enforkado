@@ -35,8 +35,8 @@ void addGeminiList(Word **head, Word **tail, char *ingredient);
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 bool isPlayerListCorrect(Word *headGemini, Word *headPlayer);
 bool checkLetterInStack(NodeStack *headStack, char letter);
-int checkLetter(Word *headGemini, char letter);
-void addPlayerList(Word **headPlayer, int index, char letter);
+int* checkLetter(Word *headGemini, char letter);
+void addPlayerList(Word **headPlayer, int *indexes, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
 char to_uppercase(char letter);
@@ -106,15 +106,18 @@ int main() {
             if (key >= 'a' && key <= 'z') key -= 32; // transforma para maiúsculo
             if (key >= 'A' && key <= 'Z' && vidas > 0 && !palavraCompleta) {
                 char letra = (char)key;
-                if (checkLetter(headGemini, letra) != 0) {
-                    addPlayerList(&headPlayer, checkLetter(headGemini, letra), letra);
-                } else {
+                int *indexes = checkLetter(headGemini, letra);
+                if (indexes != NULL && indexes[0] != -1) {
+                    addPlayerList(&headPlayer, indexes, letra);
+                }
+                else {
                     if (!checkLetterInStack(headStack, letra)) {
                         push(&headStack, letra);
                         insertionSort(&headStack);
                         vidas--;
                     }
                 }
+                free(indexes);
             }
 
             if (isPlayerListCorrect(headGemini, headPlayer)) {
@@ -302,30 +305,32 @@ bool isPlayerListCorrect(Word *headGemini, Word *headPlayer) {
     return false;
 }
 
-int checkLetter(Word *headGemini, char letter) {
-    if(headGemini != NULL) {
-        while(headGemini->letter != letter && headGemini->next != NULL) {
-            headGemini = headGemini->next;
-        }
+int* checkLetter(Word *headGemini, char letter) {
+    int *indexes = (int*)malloc(sizeof(int) * (TAM_PALAVRA + 1));
+    if (indexes == NULL) return NULL;
 
-        if(headGemini->letter == letter) {
-            return headGemini->index;
+    int i = 0;
+    while (headGemini != NULL) {
+        if (headGemini->letter == letter) {
+            indexes[i] = headGemini->index;
+            i++;
         }
+        headGemini = headGemini->next;
     }
-
-    return 0;
+    indexes[i] = -1;
+    return indexes;
 }
 
 
-void addPlayerList(Word **headPlayer, int index, char letter) {
-    if(*headPlayer != NULL) {
+void addPlayerList(Word **headPlayer, int *indexes, char letter) {
+    if (*headPlayer == NULL || indexes == NULL) return;
+
+    for (int i = 0; indexes[i] != -1; i++) {
         Word *aux = *headPlayer;
-
-        while(aux->index != index && aux->next != NULL) {
-            aux= aux->next;
+        while (aux != NULL && aux->index != indexes[i]) {
+            aux = aux->next;
         }
-
-        if(aux->index == index) {
+        if (aux != NULL && aux->index == indexes[i]) {
             aux->letter = letter;
         }
     }
