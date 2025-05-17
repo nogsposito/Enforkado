@@ -5,8 +5,8 @@
 #include "raylib.h"
 #include <curl/curl.h>
 
-#DEFINE NUM_PALAVRAS = 10
-#DEFINE TAM_PALAVRA = 51
+#define NUM_PALAVRAS = 10
+#define TAM_PALAVRA = 51
 
 typedef struct {
     char *buffer;
@@ -30,9 +30,8 @@ typedef enum { MENU, FASE, GAMEOVER } GameScreen;
 
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 char* geminiWordGenerator(const char *prompt);
-void addGeminiList(Word **head, Word **tail, const char *prompt);
-void printPilha(NodeStack *head);
-char to_uppercase(char letter);
+void colocarNoArray(char *palavras[NUM_PALAVRAS], char*ingredients);
+void addGeminiList(Word **head, Word **tail, char *ingredient);
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 bool isPlayerListCorrect(Word *headGemini, Word *headPlayer);
 bool checkLetterInStack(NodeStack *headStack, char letter);
@@ -41,11 +40,12 @@ void addPlayerList(Word **headPlayer, int index, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
 char to_uppercase(char letter);
-void colocarNoArray(char *palavras[NUM_PALAVRAS], const char *promptBase);
+void printPilha(NodeStack *head);
 
 int main() {
 
     char palavras[MAX_PALAVRAS][TAM_PALAVRA] = {{0}};
+    char *response = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
 
     if (response != NULL) {
         int i = 0;
@@ -67,7 +67,6 @@ int main() {
     GameScreen telaAtual = MENU;
     Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
 
-    char *response = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
     // tbm fazer ele retornar o nome da receita em si e mostrar no final a receita que o user fez?
 
     while (!WindowShouldClose()) {
@@ -114,19 +113,18 @@ int main() {
     Word *headGemini = NULL;
     Word *tailGemini = NULL;
 
+    char *ingredients[NUM_PALAVRAS];
+
     Word *headPlayer = NULL;
     Word *tailPlayer = NULL;
 
     int lives = 5;
 
     NodeStack *headStack = NULL;
-
-    addGeminiList(&headGemini, &tailGemini, 1, 'Q');
-    addGeminiList(&headGemini, &tailGemini, 2, 'U');
-    addGeminiList(&headGemini, &tailGemini, 3, 'E');
-    addGeminiList(&headGemini, &tailGemini, 4, 'I');
-    addGeminiList(&headGemini, &tailGemini, 5, 'J');
-    addGeminiList(&headGemini, &tailGemini, 6, 'O');
+    char *response = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
+    colocarNoArray( ingredients, response);
+    for(int i=0;i<NUM_PALAVRA;i++){
+        addGeminiList(&headGemini, &tailGemini, ingredients[i]); //fazer um for do tamanho NUM_PALAVRAS que rode 10 vezes
 
     createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
 
@@ -164,6 +162,8 @@ int main() {
         printf("Suas vidas acabaram!");
     }
     */
+    }
+    
 
     return 0;
 }
@@ -423,21 +423,3 @@ void insertionSort(NodeStack **head) {
     } 
 }
 
-void colocarNoArray(char *palavras[NUM_PALAVRAS], const char *promptBase) {
-    for (int i = 0; i < NUM_PALAVRAS; i++) {
-        char prompt[256];
-        snprintf(prompt, sizeof(prompt), "%s %d", promptBase, i + 1);
-
-        char *palavra = geminiWordGenerator(prompt);
-
-        if (palavra != NULL) {
-            palavras[i] = malloc(strlen(palavra) + 1);
-            if (palavras[i]) {
-                strcpy(palavras[i], palavra);
-            }
-            free(palavra);
-        } else {
-            palavras[i] = NULL;
-        }
-    }
-}
