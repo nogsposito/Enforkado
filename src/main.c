@@ -5,6 +5,9 @@
 #include "raylib.h"
 #include <curl/curl.h>
 
+#DEFINE NUM_PALAVRAS = 10
+#DEFINE TAM_PALAVRA = 51
+
 typedef struct {
     char *buffer;
     size_t size;
@@ -38,8 +41,24 @@ void addPlayerList(Word **headPlayer, int index, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
 char to_uppercase(char letter);
+void colocarNoArray(char *palavras[NUM_PALAVRAS], const char *promptBase);
 
 int main() {
+
+    char palavras[MAX_PALAVRAS][TAM_PALAVRA] = {{0}};
+
+    if (response != NULL) {
+        int i = 0;
+        char *token = strtok(response, " ");
+        while (token != NULL && i < MAX_PALAVRAS) {
+            strncpy(palavras[i], token, TAM_PALAVRA - 1);
+            palavras[i][TAM_PALAVRA - 1] = '\0';
+            i++;
+            token = strtok(NULL, " ");
+        }
+        free(response);
+    }
+
 
     const int largura = 800;
     const int altura = 600;
@@ -402,4 +421,23 @@ void insertionSort(NodeStack **head) {
             aux1 = aux1->next;
         }
     } 
+}
+
+void colocarNoArray(char *palavras[NUM_PALAVRAS], const char *promptBase) {
+    for (int i = 0; i < NUM_PALAVRAS; i++) {
+        char prompt[256];
+        snprintf(prompt, sizeof(prompt), "%s %d", promptBase, i + 1);
+
+        char *palavra = geminiWordGenerator(prompt);
+
+        if (palavra != NULL) {
+            palavras[i] = malloc(strlen(palavra) + 1);
+            if (palavras[i]) {
+                strcpy(palavras[i], palavra);
+            }
+            free(palavra);
+        } else {
+            palavras[i] = NULL;
+        }
+    }
 }
