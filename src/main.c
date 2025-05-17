@@ -25,8 +25,11 @@ typedef struct NodeStack{
 
 typedef enum { MENU, FASE, GAMEOVER } GameScreen;
 
-// ADICIONA EM LISTA ENCADEADA AS LETRAS DA STRING GERADA POR GEMINI
-
+static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
+char* geminiWordGenerator(const char *prompt);
+void addGeminiList(Word **head, Word **tail, const char *prompt);
+void printPilha(NodeStack *head);
+char to_uppercase(char letter);
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 bool isPlayerListCorrect(Word *headGemini, Word *headPlayer);
 bool checkLetterInStack(NodeStack *headStack, char letter);
@@ -35,6 +38,116 @@ void addPlayerList(Word **headPlayer, int index, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
 char to_uppercase(char letter);
+
+int main() {
+
+    const int largura = 800;
+    const int altura = 600;
+
+    InitWindow(largura, altura, "Jogo");
+    GameScreen telaAtual = MENU;
+    Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
+
+    char *response = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
+    // tbm fazer ele retornar o nome da receita em si e mostrar no final a receita que o user fez?
+
+    while (!WindowShouldClose()) {
+
+        if (telaAtual == MENU){
+            if (CheckCollisionPointRec(GetMousePosition(), botao) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                telaAtual = FASE;
+            } // apertar botao para fase
+        }
+
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        if (telaAtual == MENU){
+
+            DrawText("Seja bem vindo ao Enforkado!", 20, 160, 20, DARKGRAY);
+            
+            DrawRectangleRec(botao, LIGHTGRAY);
+            if (CheckCollisionPointRec(GetMousePosition(), botao)) {
+                DrawRectangleLinesEx(botao, 2, RED);
+            } else {
+                DrawRectangleLinesEx(botao, 2, BLACK);
+            }
+
+            DrawText("Começar", largura / 2 - MeasureText("Começar", 20) / 2, altura / 2 - 10, 20, BLACK);
+        } else if (telaAtual == FASE){
+            DrawText("Resposta do Gemini:", 20, 20, 20, DARKGRAY);
+            if (response) {
+                DrawText(response, 20, 60, 30, MAROON);
+            } else {
+                DrawText("Erro ao obter resposta!", 50, 60, 20, RED);
+            }
+        }
+        
+        EndDrawing();
+    }
+
+    CloseWindow();
+
+    /*
+    printf("Bem vindo ao Enforkado!\n");
+    printf("Seu objetivo e acertar o ingrediente secreto\n");
+
+    Word *headGemini = NULL;
+    Word *tailGemini = NULL;
+
+    Word *headPlayer = NULL;
+    Word *tailPlayer = NULL;
+
+    int lives = 5;
+
+    NodeStack *headStack = NULL;
+
+    addGeminiList(&headGemini, &tailGemini, 1, 'Q');
+    addGeminiList(&headGemini, &tailGemini, 2, 'U');
+    addGeminiList(&headGemini, &tailGemini, 3, 'E');
+    addGeminiList(&headGemini, &tailGemini, 4, 'I');
+    addGeminiList(&headGemini, &tailGemini, 5, 'J');
+    addGeminiList(&headGemini, &tailGemini, 6, 'O');
+
+    createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
+
+    while(!isPlayerListCorrect(headGemini, headPlayer) && lives != 0) {
+        char letter;
+
+        printf("\n%c %c %c %c %c %c\n", headPlayer->letter, headPlayer->next->letter, headPlayer->next->next->letter, headPlayer->next->next->next->letter, headPlayer->next->next->next->next->letter, headPlayer->next->next->next->next->next->letter);
+        printf("Letras tentadas:");
+        printPilha(headStack);
+        printf("\nVidas: %d\n", lives);
+
+        //Esse espaço antes é importante
+        scanf("Digite um letra: ")
+        scanf(" %c", &letter);
+        letter = to_uppercase(letter);
+
+
+        if(checkLetter(headGemini, letter) != 0) {
+            addPlayerList(&headPlayer, checkLetter(headGemini, letter), letter);
+        } else {
+            if (!checkLetterInStack(headStack, letter)) {
+                push(&headStack, letter);
+                insertionSort(&headStack);
+                lives--;
+            }
+            else {
+                printf("Voce ja errou essa letra antes");
+            }
+        }
+    }
+
+    if(isPlayerListCorrect(headGemini, headPlayer)) {
+        printf("Voce acertou!");
+    } else if(lives == 0) {
+        printf("Suas vidas acabaram!");
+    }
+    */
+
+    return 0;
+}
 
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
     size_t realsize = size * nmemb;
@@ -166,115 +279,6 @@ char to_uppercase(char letter) {
         return letter - 32;
     }
     return letter;
-}
-
-int main() {
-
-    const int largura = 800;
-    const int altura = 600;
-
-    InitWindow(largura, altura, "Jogo");
-    GameScreen telaAtual = MENU;
-    Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
-
-    char *response = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita");
-
-    while (!WindowShouldClose()) {
-
-        if (telaAtual == MENU){
-            if (CheckCollisionPointRec(GetMousePosition(), botao) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-                telaAtual = FASE;
-            } // apertar botao para fase
-        }
-
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        if (telaAtual == MENU){
-
-            DrawText("Seja bem vindo ao Enforkado!", 20, 160, 20, DARKGRAY);
-            
-            DrawRectangleRec(botao, LIGHTGRAY);
-            if (CheckCollisionPointRec(GetMousePosition(), botao)) {
-                DrawRectangleLinesEx(botao, 2, RED);
-            } else {
-                DrawRectangleLinesEx(botao, 2, BLACK);
-            }
-
-            DrawText("Começar", largura / 2 - MeasureText("Começar", 20) / 2, altura / 2 - 10, 20, BLACK);
-        } else if (telaAtual == FASE){
-            DrawText("Resposta do Gemini:", 20, 20, 20, DARKGRAY);
-            if (response) {
-                DrawText(response, 20, 60, 30, MAROON);
-            } else {
-                DrawText("Erro ao obter resposta!", 50, 60, 20, RED);
-            }
-        }
-        
-        EndDrawing();
-    }
-
-    CloseWindow();
-
-    /*
-    printf("Bem vindo ao Enforkado!\n");
-    printf("Seu objetivo e acertar o ingrediente secreto\n");
-
-    Word *headGemini = NULL;
-    Word *tailGemini = NULL;
-
-    Word *headPlayer = NULL;
-    Word *tailPlayer = NULL;
-
-    int lives = 5;
-
-    NodeStack *headStack = NULL;
-
-    addGeminiList(&headGemini, &tailGemini, 1, 'Q');
-    addGeminiList(&headGemini, &tailGemini, 2, 'U');
-    addGeminiList(&headGemini, &tailGemini, 3, 'E');
-    addGeminiList(&headGemini, &tailGemini, 4, 'I');
-    addGeminiList(&headGemini, &tailGemini, 5, 'J');
-    addGeminiList(&headGemini, &tailGemini, 6, 'O');
-
-    createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
-
-    while(!isPlayerListCorrect(headGemini, headPlayer) && lives != 0) {
-        char letter;
-
-        printf("\n%c %c %c %c %c %c\n", headPlayer->letter, headPlayer->next->letter, headPlayer->next->next->letter, headPlayer->next->next->next->letter, headPlayer->next->next->next->next->letter, headPlayer->next->next->next->next->next->letter);
-        printf("Letras tentadas:");
-        printPilha(headStack);
-        printf("\nVidas: %d\n", lives);
-
-        //Esse espaço antes é importante
-        scanf("Digite um letra: ")
-        scanf(" %c", &letter);
-        letter = to_uppercase(letter);
-
-
-        if(checkLetter(headGemini, letter) != 0) {
-            addPlayerList(&headPlayer, checkLetter(headGemini, letter), letter);
-        } else {
-            if (!checkLetterInStack(headStack, letter)) {
-                push(&headStack, letter);
-                insertionSort(&headStack);
-                lives--;
-            }
-            else {
-                printf("Voce ja errou essa letra antes");
-            }
-        }
-    }
-
-    if(isPlayerListCorrect(headGemini, headPlayer)) {
-        printf("Voce acertou!");
-    } else if(lives == 0) {
-        printf("Suas vidas acabaram!");
-    }
-    */
-
-    return 0;
 }
 
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
