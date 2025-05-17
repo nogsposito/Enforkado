@@ -30,7 +30,7 @@ typedef enum { MENU, FASE, GAMEOVER } GameScreen;
 
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 char* geminiWordGenerator(const char *prompt);
-void colocarNoArray(char *palavras[NUM_PALAVRAS], char*ingredients);
+void putIntoArray(char *words[NUM_PALAVRAS], char *ingredients);
 void addGeminiList(Word **head, Word **tail, char *ingredient);
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 bool isPlayerListCorrect(Word *headGemini, Word *headPlayer);
@@ -404,17 +404,17 @@ void insertionSort(NodeStack **head) {
     } 
 }
 
-void colocarNoArray(char *palavras[NUM_PALAVRAS], char *ingredients) {
+void putIntoArray(char *words[NUM_PALAVRAS], char *ingredients) {
     int i = 0;
     char *token = strtok(ingredients, " ");
     
     while (token != NULL && i < NUM_PALAVRAS) {
-        palavras[i] = malloc(strlen(token) + 1);
-        if (palavras[i] == NULL) {
-            fprintf(stderr, "Erro ao alocar memória.\n");
-            exit(1); 
+        words[i] = malloc(strlen(token) + 1);
+        if (words[i] == NULL) {
+            fprintf(stderr, "Memory allocation error.\n");
+            exit(1);
         }
-        strcpy(palavras[i], token);
+        strcpy(words[i], token);
         i++;
         token = strtok(NULL, " ");
     }
