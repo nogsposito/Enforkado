@@ -5,8 +5,8 @@
 #include "raylib.h"
 #include <curl/curl.h>
 
-#define NUM_PALAVRAS = 10
-#define TAM_PALAVRA = 51
+#define NUM_PALAVRAS 10
+#define TAM_PALAVRA 51
 
 typedef struct {
     char *buffer;
@@ -43,7 +43,6 @@ char to_uppercase(char letter);
 void printPilha(NodeStack *head);
 
 int main() {
-
     const int largura = 800;
     const int altura = 600;
 
@@ -51,6 +50,44 @@ int main() {
     GameScreen telaAtual = MENU;
     Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
 
+    // tbm fazer ele retornar o nome da receita em si e mostrar no final a receita que o user fez?
+
+    while (!WindowShouldClose()) {
+
+        if (telaAtual == MENU){
+            if (CheckCollisionPointRec(GetMousePosition(), botao) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+                telaAtual = FASE;
+            } // apertar botao para fase
+        }
+
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        if (telaAtual == MENU){
+
+            DrawText("Seja bem vindo ao Enforkado!", 20, 160, 20, DARKGRAY);
+            
+            DrawRectangleRec(botao, LIGHTGRAY);
+            if (CheckCollisionPointRec(GetMousePosition(), botao)) {
+                DrawRectangleLinesEx(botao, 2, RED);
+            } else {
+                DrawRectangleLinesEx(botao, 2, BLACK);
+            }
+
+            DrawText("Começar", largura / 2 - MeasureText("Começar", 20) / 2, altura / 2 - 10, 20, BLACK);
+        } else if (telaAtual == FASE){
+            DrawText("Resposta do Gemini:", 20, 20, 20, DARKGRAY);
+            if (response) {
+                DrawText(response, 20, 60, 30, MAROON);
+            } else {
+                DrawText("Erro ao obter resposta!", 50, 60, 20, RED);
+            }
+        }
+        
+        EndDrawing();
+    }
+
+    CloseWindow();
 
     /*
     printf("Bem vindo ao Enforkado!\n");
@@ -108,11 +145,9 @@ int main() {
         printf("Suas vidas acabaram!");
     }
     */
-    }
-    
-
-    return 0;
+       return 0;
 }
+    
 
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
     size_t realsize = size * nmemb;
@@ -200,10 +235,10 @@ char* geminiWordGenerator(const char *prompt) {
     return NULL;
 }
 
-void addGeminiList(Word **head, Word **tail, const char *prompt){
+void addGeminiList(Word **head, Word **tail, char *ingredient){
     
     char palavra[51];
-    strcpy(palavra, prompt);
+    strcpy(palavra, ingredient);
 
     int i = 0;
     
