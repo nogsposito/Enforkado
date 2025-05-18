@@ -17,7 +17,7 @@
 
 ## 📄 Descrição
 
-O jogo gira em torno de tentar acertar as letras que compõem as palavras que serão ingredientes para uma receita, caso o usuário tente uma determinada quantidade de vezes e não acerte as letras, ele irá colocar ingredientes errados e sua receita será um fracasso.
+O jogo gira em torno de tentar acertar as letras que compõem as palavras que serão ingredientes para uma receita, caso o usuário tente ,mais de 5 vezes e não acerte as letras, ele irá colocar ingredientes errados e sua receita será um fracasso.
 
 ## 🎲 Objetivo do Jogo
 
@@ -25,7 +25,7 @@ Acertar as palavras secretas para cozinhar uma receita de alta pontuação, de a
 
 ## 🕹️ Como Jogar
 
-
+Tente acertar o ingrediente secreto inserindo letra por letra. Mas lembre: Você tem apenas 5 vidas para cada ingrediente secreto. Se errar 5 vezes, perde!
 
 ## ♟️ Executando o Jogo
 
