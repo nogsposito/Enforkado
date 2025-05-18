@@ -77,10 +77,10 @@ int main() {
         Color corDeFundo = (modoAtual == LIGHTMODE) ? RAYWHITE : (Color){30, 30, 30, 255};
         Color corTexto = (modoAtual == LIGHTMODE) ? BLACK : RAYWHITE;
         Color corBotao = (modoAtual == LIGHTMODE) ? LIGHTGRAY : DARKGRAY;
-        Color corTitulo = (modoAtual == LIGHTMODE) ? DARKGRAY : GRAY;
-        Color corVidas = (modoAtual == LIGHTMODE) ? BLUE : SKYBLUE;
+        Color corTitulo = (modoAtual == LIGHTMODE) ? DARKGRAY : RAYWHITE;
+        Color corVidas = (modoAtual == LIGHTMODE) ? RED : RED;
         Color corAcerto = (modoAtual == LIGHTMODE) ? DARKGREEN : GREEN;
-        Color corErro = (modoAtual == LIGHTMODE) ? RED : ORANGE;
+        Color corErro = (modoAtual == LIGHTMODE) ? RED : RED;
 
         BeginDrawing();
         ClearBackground(corDeFundo);
@@ -95,10 +95,10 @@ int main() {
                 modoAtual = (modoAtual == LIGHTMODE) ? DARKMODE : LIGHTMODE;
             }
 
-            DrawText("MENU PRINCIPAL", largura / 2 - MeasureText("BEM VINDO AO ENFORKADO", 20) / 2, 100, 20, DARKGRAY);
+            DrawText("BEM VINDO AO ENFORKADO", largura / 2 - MeasureText("BEM VINDO AO ENFORKADO", 20) / 2, 100, 20, corTitulo);
             
             // BOTAO DE PLAY:
-            DrawRectangleRec(botao, LIGHTGRAY);
+            DrawRectangleRec(botao, corBotao);
             if (CheckCollisionPointRec(GetMousePosition(), botao)) {
                 DrawRectangleLinesEx(botao, 2, RED);
             } else {
@@ -106,7 +106,7 @@ int main() {
             }
 
             // BOTAO DE DARK MODE:
-            DrawRectangleRec(botaoDarkMode, LIGHTGRAY);
+            DrawRectangleRec(botaoDarkMode, corBotao);
             if (CheckCollisionPointRec(GetMousePosition(), botaoDarkMode)) {
                 DrawRectangleLinesEx(botaoDarkMode, 2, RED);
             } else {
@@ -117,25 +117,25 @@ int main() {
             DrawText("Começar jogo", largura / 2 - MeasureText("Começar jogo", 20) / 2, altura / 2 - 10, 20, BLACK);
 
         } else if (telaAtual == FASE) {
-            DrawText("Acerte o ingrediente secreto!", 20, 20, 20, DARKGRAY);
+            DrawText("Acerte o ingrediente secreto!", 20, 20, 20, corTexto);
 
             // Desenha letras da palavra
             Word *temp = headPlayer;
             int x = 40;
             while (temp != NULL) {
                 char letra[2] = { temp->letter, '\0' };
-                DrawText(letra, x, 100, 40, BLACK);
+                DrawText(letra, x, 100, 40, corTexto);
                 x += 45;
                 temp = temp->next;
             }
 
             // Desenha letras erradas
-            DrawText("Letras erradas:", 20, 180, 20, RED);
+            DrawText("Letras erradas:", 20, 180, 20, corTexto);
             NodeStack *erro = headStack;
             int xErro = 200;
             while (erro != NULL) {
                 char letra[2] = { erro->letter, '\0' };
-                DrawText(letra, xErro, 180, 20, RED);
+                DrawText(letra, xErro, 180, 20, corErro);
                 xErro += 25;
                 erro = erro->next;
             }
@@ -143,7 +143,7 @@ int main() {
             // Mostra vidas
             char vidasTexto[20];
             sprintf(vidasTexto, "Vidas: %d", vidas);
-            DrawText(vidasTexto, 20, 220, 20, BLUE);
+            DrawText(vidasTexto, 20, 220, 20, corVidas);
 
             // Entrada de teclado
             int key = toUppercase(GetCharPressed());
@@ -164,8 +164,8 @@ int main() {
 
             if (isPlayerListCorrect(headGemini, headPlayer)) {
                 palavraCompleta = true;
-                DrawText("Voce acertou!", 20, 300, 30, DARKGREEN);
-                DrawText("Pressione ENTER para continuar", 20, 340, 20, DARKGRAY);
+                DrawText("Voce acertou!", 20, 300, 30, corAcerto);
+                DrawText("Pressione ENTER para continuar", 20, 340, 20, corTexto);
 
                 // Aguarda a tecla ENTER para avançar para a próxima palavra
                 if (IsKeyPressed(KEY_ENTER)) {
@@ -210,16 +210,16 @@ int main() {
                     }
                 }
             } else if (vidas == 0) {
-                DrawText("Suas vidas acabaram!", 20, 300, 30, MAROON);
-                DrawText("Pressione ENTER para continuar", 20, 340, 20, DARKGRAY);
+                DrawText("Suas vidas acabaram!", 20, 300, 30, corErro);
+                DrawText("Pressione ENTER para continuar", 20, 340, 20, corTexto);
                 // Aguarda a tecla ENTER para ir para GAMEOVER
                 if (IsKeyPressed(KEY_ENTER)) {
                     telaAtual = GAMEOVER;
                 }
             }
         } else if (telaAtual == GAMEOVER) {
-            DrawText("Fim de Jogo!", 20, 300, 30, MAROON);
-            DrawText("Pressione ENTER para nova partida ou ESC para sair", 20, 350, 20, DARKGRAY);
+            DrawText("Fim de Jogo!", 20, 300, 30, corErro);
+            DrawText("Pressione ENTER para nova partida ou ESC para sair", 20, 350, 20, corTexto);
 
             if (IsKeyPressed(KEY_ENTER)) {
                 // Libera as listas atuais
@@ -264,7 +264,7 @@ int main() {
                 // Gera uma nova lista de palavras
                 resposta = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
                 if (resposta == NULL) {
-                    DrawText("Erro ao carregar palavras!", 20, 400, 20, RED);
+                    DrawText("Erro ao carregar palavras!", 20, 400, 20, corErro);
                     continue;
                 }
                 stringToArray(resposta, ingredientes);
@@ -275,7 +275,7 @@ int main() {
                 createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
                 vidas = 5;
                 palavraCompleta = false;
-                telaAtual = FASE;
+                telaAtual = MENU;
             }
         }
 
