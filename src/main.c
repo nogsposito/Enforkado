@@ -5,10 +5,10 @@
 #include "raylib.h"
 #include <curl/curl.h>
 
-#define NUM_PALAVRAS 10
-#define TAM_PALAVRA 51
+#define NUM_INGREDIENTS 10
+#define WORD_SIZE 51
 
-typedef struct {
+typedef struct MemoryStruct {
     char *buffer;
     size_t size;
 } MemoryStruct;
@@ -30,8 +30,8 @@ typedef enum { MENU, FASE, GAMEOVER } GameScreen;
 
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 char* geminiWordGenerator(const char *prompt);
-void putIntoArray(char *words[NUM_PALAVRAS], char *ingredients);
-void addGeminiList(Word **head, Word **tail, char *ingredient);
+void stringToArray(char *ingredients, char *ingredientArray[NUM_INGREDIENTS]);
+void addSecretIngredient(Word **headSecret, Word **tailSecret, char *ingredient);
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
 bool isPlayerListCorrect(Word *headGemini, Word *headPlayer);
 bool checkLetterInStack(NodeStack *headStack, char letter);
@@ -40,7 +40,6 @@ void addPlayerList(Word **headPlayer, int *indexes, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
 char to_uppercase(char letter);
-void printPilha(NodeStack *head);
 
 int main() {
     const int largura = 800;
@@ -60,12 +59,12 @@ int main() {
     int vidas = 5;
     bool palavraCompleta = false;
 
-    char *ingredientes[NUM_PALAVRAS];
+    char *ingredientes[NUM_INGREDIENTS];
     char *resposta = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
-    putIntoArray(ingredientes, resposta);
+    stringToArray(resposta, ingredientes);
 
     int palavraAtual = 0;
-    addGeminiList(&headGemini, &tailGemini, ingredientes[palavraAtual]);
+    addSecretIngredient(&headGemini, &tailGemini, ingredientes[palavraAtual]);
     createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
 
     while (!WindowShouldClose()) {
@@ -155,9 +154,9 @@ int main() {
 
                     // Avança para a próxima palavra
                     palavraAtual++;
-                    if (palavraAtual < NUM_PALAVRAS && ingredientes[palavraAtual] != NULL) {
+                    if (palavraAtual < NUM_INGREDIENTS && ingredientes[palavraAtual] != NULL) {
                         // Reinicia o estado do jogo
-                        addGeminiList(&headGemini, &tailGemini, ingredientes[palavraAtual]);
+                        addSecretIngredient(&headGemini, &tailGemini, ingredientes[palavraAtual]);
                         createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
                         vidas = 5;
                         palavraCompleta = false;
@@ -207,7 +206,7 @@ int main() {
                 headStack = NULL;
 
                 // Libera o array de palavras anterior
-                for (int i = 0; i < NUM_PALAVRAS; i++) {
+                for (int i = 0; i < NUM_INGREDIENTS; i++) {
                     if (ingredientes[i] != NULL) {
                         free(ingredientes[i]);
                         ingredientes[i] = NULL;
@@ -224,11 +223,11 @@ int main() {
                     DrawText("Erro ao carregar palavras!", 20, 400, 20, RED);
                     continue;
                 }
-                putIntoArray(ingredientes, resposta);
+                stringToArray(resposta, ingredientes);
 
                 // Reinicia o estado do jogo
                 palavraAtual = 0;
-                addGeminiList(&headGemini, &tailGemini, ingredientes[palavraAtual]);
+                addSecretIngredient(&headGemini, &tailGemini, ingredientes[palavraAtual]);
                 createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
                 vidas = 5;
                 palavraCompleta = false;
@@ -258,7 +257,7 @@ int main() {
         free(tempStack);
         tempStack = next;
     }
-    for (int i = 0; i < NUM_PALAVRAS; i++) {
+    for (int i = 0; i < NUM_INGREDIENTS; i++) {
         if (ingredientes[i] != NULL) free(ingredientes[i]);
     }
     if (resposta != NULL) free(resposta);
@@ -266,14 +265,13 @@ int main() {
     CloseWindow();
     return 0;
 }
-    
 
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
     size_t realsize = size * nmemb;
     MemoryStruct *mem = (MemoryStruct *)userp;
 
     char *ptr = realloc(mem->buffer, mem->size + realsize + 1);
-    if (ptr == NULL) return 0;
+    if(ptr == NULL) return 0;
 
     mem->buffer = ptr;
     memcpy(&(mem->buffer[mem->size]), contents, realsize);
@@ -291,7 +289,7 @@ char* geminiWordGenerator(const char *prompt) {
     chunk.buffer = malloc(1);
     chunk.size = 0;
 
-    const char *api_key = "AIzaSyAwO9mHjyuJfKTHLZMfl2TLCeOS5oSPOHk";  // substitua aqui
+    const char *api_key = "AIzaSyAwO9mHjyuJfKTHLZMfl2TLCeOS5oSPOHk";
     const char *model = "gemini-1.5-flash-latest";
 
     char url[512];
@@ -308,7 +306,7 @@ char* geminiWordGenerator(const char *prompt) {
     curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
 
-    if (curl) {
+    if(curl) {
         struct curl_slist *headers = NULL;
         headers = curl_slist_append(headers, "Content-Type: application/json; charset=UTF-8");
 
@@ -322,7 +320,7 @@ char* geminiWordGenerator(const char *prompt) {
 
         res = curl_easy_perform(curl);
 
-        if (res != CURLE_OK) {
+        if(res != CURLE_OK) {
             fprintf(stderr, "Erro na requisição: %s\n", curl_easy_strerror(res));
             free(chunk.buffer);
             chunk.buffer = NULL;
@@ -334,12 +332,12 @@ char* geminiWordGenerator(const char *prompt) {
 
     curl_global_cleanup();
 
-    if (chunk.buffer) {
+    if(chunk.buffer) {
         char *start = strstr(chunk.buffer, "\"text\": \"");
-        if (start) {
+        if(start) {
             start += strlen("\"text\": \"");
             char *end = strchr(start, '"');
-            if (end) {
+            if(end) {
                 size_t len = end - start;
                 char *result = malloc(len + 1);
                 strncpy(result, start, len);
@@ -354,50 +352,44 @@ char* geminiWordGenerator(const char *prompt) {
     return NULL;
 }
 
-void addGeminiList(Word **head, Word **tail, char *ingredient){
+void stringToArray(char *ingredients, char *ingredientArray[NUM_INGREDIENTS]) {
+    int i = 0;
+    char *token = strtok(ingredients, " ");
     
-    char palavra[51];
-    strcpy(palavra, ingredient);
+    while(token != NULL && i < NUM_INGREDIENTS) {
+        ingredientArray[i] = malloc(strlen(token) + 1);
 
+        if(ingredientArray[i] != NULL) {
+            strcpy(ingredientArray[i], token);
+            i++;
+            token = strtok(NULL, " ");
+        }
+    }
+}
+
+void addSecretIngredient(Word **headSecret, Word **tailSecret, char *ingredient){
     int i = 0;
     
-    while (palavra[i] != '\0'){
-
-        if (palavra[i] == '\\' && palavra[i+1] == 'n'){
-            break;
-        }
-
+    while(ingredient[i] != '\0' && ingredient[i] != '\\' && ingredient[i+1] != 'n'){
         Word *novo = (Word*)malloc(sizeof(Word));
-        if (novo == NULL) return;
 
-        novo->letter = palavra[i];
-        novo->index = i+1;
+        if(novo != NULL) {
+            novo->index = i+1;
+            novo->letter = ingredient[i];
 
-        if (*head == NULL){
-            *head = novo;
-            *tail = novo;
-            novo->prev = NULL;
-        } else {
-            (*tail)->next = novo;
-            novo->prev = *tail;
-            *tail = novo;
+            if(*headSecret == NULL){
+                *headSecret = novo;
+            } else {
+                (*tailSecret)->next = novo;  
+            }
+
+            novo->prev = *tailSecret;
+            *tailSecret = novo;
+            (*tailSecret)->next = NULL;
         }
+
         i++;
     }
-}
-
-void printPilha(NodeStack *head){ 
-	while(head != NULL) {
-		printf("%c ", head->letter);
-		head = head->next;
-	}
-}
-
-char to_uppercase(char letter) {
-    if (letter >= 'a' && letter <= 'z') {
-        return letter - 32;
-    }
-    return letter;
 }
 
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
@@ -437,7 +429,7 @@ bool isPlayerListCorrect(Word *headGemini, Word *headPlayer) {
 }
 
 int* checkLetter(Word *headGemini, char letter) {
-    int *indexes = (int*)malloc(sizeof(int) * (TAM_PALAVRA + 1));
+    int *indexes = (int*)malloc(sizeof(int) * (WORD_SIZE + 1));
     if (indexes == NULL) return NULL;
 
     int i = 0;
@@ -525,18 +517,9 @@ void insertionSort(NodeStack **head) {
     } 
 }
 
-void putIntoArray(char *words[NUM_PALAVRAS], char *ingredients) {
-    int i = 0;
-    char *token = strtok(ingredients, " ");
-    
-    while (token != NULL && i < NUM_PALAVRAS) {
-        words[i] = malloc(strlen(token) + 1);
-        if (words[i] == NULL) {
-            fprintf(stderr, "Memory allocation error.\n");
-            exit(1);
-        }
-        strcpy(words[i], token);
-        i++;
-        token = strtok(NULL, " ");
+char to_uppercase(char letter) {
+    if (letter >= 'a' && letter <= 'z') {
+        return letter - 32;
     }
+    return letter;
 }
