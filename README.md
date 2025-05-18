@@ -81,15 +81,15 @@ O código do jogo está inteiramente em um arquivo (Excluindo suas dependências
   
 - stringToArray (void): Recebe String (no uso do código, o prompt dado pelo Gemini de 10 ingredientes listados para uma receita aleatória) e uma array, preenchendo o array com cada elemento sendo um dos ingredientes dados.
   
-- addSecretIngredient(void):
+- addSecretIngredient(void): Recebe uma head, uma tail e uma string de uma lista encadeada e um ingrediente (No contxto do código, da lista de letras "palavra" gerada pelo Gemini, a que o jogador deve acertar) e adiciona nela uma nova letra (nó na lista). 
   
 - createPlayerList (void): Recebe uma head e uma tail de uma lista encadeada e uma quantidade e cria uma quantidade (recebida no parâmetro) de elemetos na lista.
   
-- isPlayerListCorrect(bool):
+- isPlayerListCorrect(bool): Recebe a head da palavra do Gemini (lista encadeada com letras) e head da palavra do Jogador (que ele constroi com base em suas tentativas) e verifica se a palavra está correta, comparando caso as duas sejam iguais. caso esteja, retorna true, senão retorna false.
   
 - toUpperCase (char): Recebe um caractére e o retorna em uppercase.
   
-- checkLetterInSecret (int *):
+- checkLetterInSecret (int *): Recebe a head da palavra do Gemini e o char dado como input pelo jogador (Quando tenta adivinhar letra) e retorna um array de inteiros que indica em que posições uma letra aparece.
   
 - addPlayerList (void): Recebe a head de uma lista e um caractére dado pelo jogador, e adiciona na lista a letra adivinhada pelo jogador (No contexto da lógica, só caso estiver certo).
   
