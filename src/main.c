@@ -48,7 +48,8 @@ int main() {
     InitWindow(largura, altura, "Enforkado");
     SetTargetFPS(60);
 
-    GameScreen telaAtual = FASE;
+    GameScreen telaAtual = MENU;
+    Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
 
     Word *headGemini = NULL;
     Word *tailGemini = NULL;
@@ -68,10 +69,28 @@ int main() {
     createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
 
     while (!WindowShouldClose()) {
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        if (telaAtual == FASE) {
+        if (telaAtual == MENU){
+
+            if (CheckCollisionPointRec(GetMousePosition(), botao) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                telaAtual = FASE;
+            }
+
+            DrawText("MENU PRINCIPAL", largura / 2 - MeasureText("BEM VINDO AO ENFORKADO", 20) / 2, 100, 20, DARKGRAY);
+            DrawRectangleRec(botao, LIGHTGRAY);
+
+            if (CheckCollisionPointRec(GetMousePosition(), botao)) {
+                DrawRectangleLinesEx(botao, 2, RED);
+            } else {
+                DrawRectangleLinesEx(botao, 2, BLACK);
+            }
+
+            DrawText("Começar jogo", largura / 2 - MeasureText("Começar jogo", 20) / 2, altura / 2 - 10, 20, BLACK);
+
+        } else if (telaAtual == FASE) {
             DrawText("Acerte o ingrediente secreto!", 20, 20, 20, DARKGRAY);
 
             // Desenha letras da palavra
