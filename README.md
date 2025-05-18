@@ -75,7 +75,7 @@ O código do jogo está inteiramente em um arquivo (Excluindo suas dependências
 
 ### Funções Criadas:
 
-- WriteMemoryCallback (static size_t): Para uso interno de geminiWordGenerator.
+- writeMemoryCallback (static size_t): Para uso interno de geminiWordGenerator.
   
 - geminiWordGenerator (char*): Função que chama o Gemini API, que recebe uma String que contém um prompt, requisitando algo à API e retornando uma resposta do Gemini em String.
   
