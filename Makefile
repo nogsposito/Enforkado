@@ -1,15 +1,29 @@
+# Nome do executável e pasta de saída
+TARGET = Enforkado
+BIN_DIR = bin
+SRC_DIR = src
+
+# Arquivo principal
+SRC = $(SRC_DIR)/main.c
+
+# Compilador e flags
 CC = gcc
-SRC = src/main.c
-BIN = bin/jogo
-CFLAGS = -lraylib -lm -ldl -lpthread -lGL -lrt -lX11 -lcurl
+CFLAGS = -Wall -Wextra -O2
+LDFLAGS = -lraylib -lcurl -lGL -lm -lpthread -ldl -lrt -lX11
 
-all: $(BIN)
+# Caminho completo do executável
+OUT = $(BIN_DIR)/$(TARGET)
 
-$(BIN): $(SRC)
-	$(CC) $(SRC) -o $(BIN) $(CFLAGS)
+.PHONY: all run clean
 
-run: $(BIN)
-	./$(BIN)
+all: $(OUT)
+
+$(OUT): $(SRC)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
+
+run: all
+	./$(OUT)
 
 clean:
-	rm -f $(BIN)
+	rm -f $(BIN_DIR)/$(TARGET)
