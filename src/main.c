@@ -176,7 +176,64 @@ int main() {
             }
         } else if (telaAtual == GAMEOVER) {
             DrawText("Fim de Jogo!", 20, 300, 30, MAROON);
-            DrawText("Pressione ESC para sair", 20, 350, 20, DARKGRAY);
+            DrawText("Pressione ENTER para nova partida ou ESC para sair", 20, 350, 20, DARKGRAY);
+
+            if (IsKeyPressed(KEY_ENTER)) {
+                // Libera as listas atuais
+                Word *temp = headGemini;
+                while (temp != NULL) {
+                    Word *next = temp->next;
+                    free(temp);
+                    temp = next;
+                }
+                headGemini = NULL;
+                tailGemini = NULL;
+
+                temp = headPlayer;
+                while (temp != NULL) {
+                    Word *next = temp->next;
+                    free(temp);
+                    temp = next;
+                }
+                headPlayer = NULL;
+                tailPlayer = NULL;
+
+                NodeStack *tempStack = headStack;
+                while (tempStack != NULL) {
+                    NodeStack *next = tempStack->next;
+                    free(tempStack);
+                    tempStack = next;
+                }
+                headStack = NULL;
+
+                // Libera o array de palavras anterior
+                for (int i = 0; i < NUM_PALAVRAS; i++) {
+                    if (ingredientes[i] != NULL) {
+                        free(ingredientes[i]);
+                        ingredientes[i] = NULL;
+                    }
+                }
+                if (resposta != NULL) {
+                    free(resposta);
+                    resposta = NULL;
+                }
+
+                // Gera uma nova lista de palavras
+                resposta = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
+                if (resposta == NULL) {
+                    DrawText("Erro ao carregar palavras!", 20, 400, 20, RED);
+                    continue;
+                }
+                putIntoArray(ingredientes, resposta);
+
+                // Reinicia o estado do jogo
+                palavraAtual = 0;
+                addGeminiList(&headGemini, &tailGemini, ingredientes[palavraAtual]);
+                createPlayerList(&headPlayer, &tailPlayer, tailGemini->index);
+                vidas = 5;
+                palavraCompleta = false;
+                telaAtual = FASE;
+            }
         }
 
         EndDrawing();
