@@ -72,16 +72,27 @@ O código do jogo está inteiramente em um arquivo (Excluindo suas dependências
 ### Funções Criadas:
 
 - WriteMemoryCallback (static size_t): Para uso interno de geminiWordGenerator.
+  
 - geminiWordGenerator (char*): Função que chama o Gemini API, que recebe uma String que contém um prompt, requisitando algo à API e retornando uma resposta do Gemini em String.
+  
 - stringToArray (void): Recebe String (no uso do código, o prompt dado pelo Gemini de 10 ingredientes listados para uma receita aleatória) e uma array, preenchendo o array com cada elemento sendo um dos ingredientes dados.
+  
 - addSecretIngredient(void):
+  
 - createPlayerList (void): Recebe uma head e uma tail de uma lista encadeada e uma quantidade e cria uma quantidade (recebida no parâmetro) de elemetos na lista.
+  
 - isPlayerListCorrect(bool):
+  
 - toUpperCase (char): Recebe um caractére e o retorna em uppercase.
+  
 - checkLetterInSecret (int *):
+  
 - addPlayerList (void): Recebe a head de uma lista e um caractére dado pelo jogador, e adiciona na lista a letra adivinhada pelo jogador (No contexto da lógica, só caso estiver certo).
+  
 - checkLetterInStack(bool): Recebe uma head de uma pilha e uma letra (char) e verifica se a letra está na pilha, retornando true ou false.
+  
 - push (void): Recebe uma pilha e uma letra (char) e insere a letra na pilha.
+  
 - insertionSort (void): recebe um pilha e a reorganiza em ordem de acordo com um algoritmo InsertionSort.
 
 
