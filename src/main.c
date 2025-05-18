@@ -33,13 +33,13 @@ char* geminiWordGenerator(const char *prompt);
 void stringToArray(char *ingredients, char *ingredientArray[NUM_INGREDIENTS]);
 void addSecretIngredient(Word **headSecret, Word **tailSecret, char *ingredient);
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght);
-bool isPlayerListCorrect(Word *headGemini, Word *headPlayer);
-bool checkLetterInStack(NodeStack *headStack, char letter);
-int* checkLetter(Word *headGemini, char letter);
+bool isPlayerListCorrect(Word *headSecret, Word *headPlayer);
+char toUppercase(char letter);
+int* checkLetterInSecret(Word *headSecret, char letter);
 void addPlayerList(Word **headPlayer, int *indexes, char letter);
+bool checkLetterInStack(NodeStack *headStack, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
-char to_uppercase(char letter);
 
 int main() {
     const int largura = 800;
@@ -101,11 +101,10 @@ int main() {
             DrawText(vidasTexto, 20, 220, 20, BLUE);
 
             // Entrada de teclado
-            int key = GetCharPressed();
-            if (key >= 'a' && key <= 'z') key -= 32; // transforma para maiúsculo
+            int key = toUppercase(GetCharPressed());
             if (key >= 'A' && key <= 'Z' && vidas > 0 && !palavraCompleta) {
                 char letra = (char)key;
-                int *indexes = checkLetter(headGemini, letra);
+                int *indexes = checkLetterInSecret(headGemini, letra);
                 if (indexes != NULL && indexes[0] != -1) {
                     addPlayerList(&headPlayer, indexes, letra);
                 } else {
@@ -415,61 +414,76 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
     }
 }
 
-bool isPlayerListCorrect(Word *headGemini, Word *headPlayer) {
-    if(headGemini != NULL && headPlayer != NULL) {
-        while(headGemini != NULL && headPlayer != NULL && headGemini->letter == headPlayer->letter) {
-            headGemini = headGemini->next;
+bool isPlayerListCorrect(Word *headSecret, Word *headPlayer) {
+    if(headSecret != NULL && headPlayer != NULL) {
+        while(headSecret != NULL && headPlayer != NULL && headSecret->letter == headPlayer->letter) {
+            headSecret = headSecret->next;
             headPlayer = headPlayer->next;
         }
 
-        return headGemini == NULL && headPlayer == NULL;
+        return headSecret == NULL && headPlayer == NULL;
     }
 
     return false;
 }
 
-int* checkLetter(Word *headGemini, char letter) {
-    int *indexes = (int*)malloc(sizeof(int) * (WORD_SIZE + 1));
-    if (indexes == NULL) return NULL;
-
-    int i = 0;
-    while (headGemini != NULL) {
-        if (headGemini->letter == letter) {
-            indexes[i] = headGemini->index;
-            i++;
-        }
-        headGemini = headGemini->next;
+char toUppercase(char letter) {
+    if (letter >= 'a' && letter <= 'z') {
+        return letter - 32;
     }
-    indexes[i] = -1;
-    return indexes;
+
+    return letter;
 }
 
+int* checkLetterInSecret(Word *headSecret, char letter) {
+    int *indexes = (int*)malloc(sizeof(int) * (WORD_SIZE + 1));
+    if(indexes == NULL) return NULL;
+
+    int i = 0;
+
+    while(headSecret != NULL) {
+        if(headSecret->letter == letter) {
+            indexes[i] = headSecret->index;
+            i++;
+        }
+
+        headSecret = headSecret->next;
+    }
+
+    indexes[i] = -1;
+
+    return indexes;
+}
 
 void addPlayerList(Word **headPlayer, int *indexes, char letter) {
     if (*headPlayer == NULL || indexes == NULL) return;
 
     for (int i = 0; indexes[i] != -1; i++) {
         Word *aux = *headPlayer;
+
         while (aux != NULL && aux->index != indexes[i]) {
             aux = aux->next;
         }
+
         if (aux != NULL && aux->index == indexes[i]) {
             aux->letter = letter;
         }
     }
 }
 
-void push(NodeStack **headStack, char letter){
-    NodeStack *aux = *headStack;
-
-    while (aux != NULL) {
-        if (aux->letter == letter) {
-            return;
+bool checkLetterInStack(NodeStack *headStack, char letter) {
+    while(headStack != NULL) {
+        if(headStack->letter == letter) {
+            return true;
         }
 
-        aux = aux->next;
+        headStack = headStack->next;
     }
 
+    return false;
+}
+
+void push(NodeStack **headStack, char letter){
     NodeStack *new = (NodeStack*)malloc(sizeof(NodeStack));
 
     if(new != NULL) {
@@ -484,17 +498,6 @@ void push(NodeStack **headStack, char letter){
         *headStack = new;
     }
 }
-
-bool checkLetterInStack(NodeStack *headStack, char letter) {
-    while (headStack != NULL) {
-        if (headStack->letter == letter) {
-            return true;
-        }
-        headStack = headStack->next;
-    }
-    return false;
-}
-
 
 void insertionSort(NodeStack **head) {
     if(*head != NULL) {
@@ -515,11 +518,4 @@ void insertionSort(NodeStack **head) {
             aux1 = aux1->next;
         }
     } 
-}
-
-char to_uppercase(char letter) {
-    if (letter >= 'a' && letter <= 'z') {
-        return letter - 32;
-    }
-    return letter;
 }
