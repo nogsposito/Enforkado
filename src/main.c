@@ -27,6 +27,7 @@ typedef struct NodeStack{
 } NodeStack;
 
 typedef enum { MENU, FASE, GAMEOVER } GameScreen;
+typedef enum { LIGHTMODE, DARKMODE } ColorMode;
 
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 char* geminiWordGenerator(const char *prompt);
@@ -51,6 +52,9 @@ int main() {
     GameScreen telaAtual = MENU;
     Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
 
+    ColorMode modoAtual = LIGHTMODE;
+    Rectangle botaoDarkMode = { largura / 2 - 100, altura / 2 + 50, 200, 50 };
+
     Word *headGemini = NULL;
     Word *tailGemini = NULL;
     Word *headPlayer = NULL;
@@ -70,24 +74,46 @@ int main() {
 
     while (!WindowShouldClose()) {
 
+        Color corDeFundo = (modoAtual == LIGHTMODE) ? RAYWHITE : (Color){30, 30, 30, 255};
+        Color corTexto = (modoAtual == LIGHTMODE) ? BLACK : RAYWHITE;
+        Color corBotao = (modoAtual == LIGHTMODE) ? LIGHTGRAY : DARKGRAY;
+        Color corTitulo = (modoAtual == LIGHTMODE) ? DARKGRAY : GRAY;
+        Color corVidas = (modoAtual == LIGHTMODE) ? BLUE : SKYBLUE;
+        Color corAcerto = (modoAtual == LIGHTMODE) ? DARKGREEN : GREEN;
+        Color corErro = (modoAtual == LIGHTMODE) ? RED : ORANGE;
+
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(corDeFundo);
 
         if (telaAtual == MENU){
 
+            // CHECA CLIQUES NOS BOTOES
             if (CheckCollisionPointRec(GetMousePosition(), botao) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
                 telaAtual = FASE;
             }
+            if (CheckCollisionPointRec(GetMousePosition(), botaoDarkMode) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                modoAtual = (modoAtual == LIGHTMODE) ? DARKMODE : LIGHTMODE;
+            }
 
             DrawText("MENU PRINCIPAL", largura / 2 - MeasureText("BEM VINDO AO ENFORKADO", 20) / 2, 100, 20, DARKGRAY);
+            
+            // BOTAO DE PLAY:
             DrawRectangleRec(botao, LIGHTGRAY);
-
             if (CheckCollisionPointRec(GetMousePosition(), botao)) {
                 DrawRectangleLinesEx(botao, 2, RED);
             } else {
                 DrawRectangleLinesEx(botao, 2, BLACK);
             }
 
+            // BOTAO DE DARK MODE:
+            DrawRectangleRec(botaoDarkMode, LIGHTGRAY);
+            if (CheckCollisionPointRec(GetMousePosition(), botaoDarkMode)) {
+                DrawRectangleLinesEx(botaoDarkMode, 2, RED);
+            } else {
+                DrawRectangleLinesEx(botaoDarkMode, 2, BLACK);
+            }
+
+            DrawText(modoAtual == LIGHTMODE ? "Modo Escuro" : "Modo Claro", largura / 2 - MeasureText("Modo Escuro", 20) / 2, altura / 2 + 65, 20, BLACK);
             DrawText("Começar jogo", largura / 2 - MeasureText("Começar jogo", 20) / 2, altura / 2 - 10, 20, BLACK);
 
         } else if (telaAtual == FASE) {
