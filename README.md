@@ -32,9 +32,13 @@ Tente acertar o ingrediente secreto inserindo letra por letra. Mas lembre: Você
 Supondo que você já tenha as dependências do Raylib e Curl para o Gemini instalados no seu pc, basta:
 
 1. Ir ao terminal do seu PC e rodar o comanndo `git clone https://github.com/nogsposito/Enforkado` para clonar o repositório em sua máquina
+   
 2. Entrar no diretório do projeto (Pod-se fazer com `cd Enforkado/` (Atente-se que alguns comandos podem variar dependendo do seu Sistema Operacional)
+   
 3. Quando estiver dentro do diretório, rodar o comando `make` para compilar o código, por meio da Makefile do projeto.
+   
 4. Rodar o comando `make run` para, então, rodar o jogo. Assim, deverá aparecer uma interface gráfica com as telas do jogo.
+   
 5. Quando o jogo acabar e você sair, você pode opcionalmente rodar o comando `make clean` para limpar os arquivos compilados.
 
 ## Sobre o código:
