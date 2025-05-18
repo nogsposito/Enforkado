@@ -13,6 +13,7 @@ typedef struct MemoryStruct {
     size_t size;
 } MemoryStruct;
 
+// Lista duplamente encadeada para armazenar letras de uma palavra
 typedef struct Word{
     int index;
     char letter;
@@ -20,6 +21,7 @@ typedef struct Word{
     struct Word *prev;
 } Word;
 
+// Pilha duplamente encadeada para armazenar letras
 typedef struct NodeStack{
     char letter;
     struct NodeStack *next;
@@ -283,6 +285,7 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
     return realsize;
 }
 
+// Envia prompt à API Gemini e retorna a resposta (uma string)
 char* geminiWordGenerator(const char *prompt) {
     CURL *curl;
     CURLcode res;
@@ -354,6 +357,7 @@ char* geminiWordGenerator(const char *prompt) {
     return NULL;
 }
 
+// Converte string de ingredientes em array de strings
 void stringToArray(char *ingredients, char *ingredientArray[NUM_INGREDIENTS]) {
     int i = 0;
     char *token = strtok(ingredients, " ");
@@ -369,6 +373,7 @@ void stringToArray(char *ingredients, char *ingredientArray[NUM_INGREDIENTS]) {
     }
 }
 
+// Constrói lista duplamente encadeada com as letras da palavra secreta
 void addSecretIngredient(Word **headSecret, Word **tailSecret, char *ingredient){
     int i = 0;
     
@@ -394,6 +399,7 @@ void addSecretIngredient(Word **headSecret, Word **tailSecret, char *ingredient)
     }
 }
 
+// Cria lista do jogador com letras em branco ('_')
 void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
     if(*headPlayer == NULL && *tailPlayer == NULL) {
         for(int i = 0; i < lenght; i++) {
@@ -417,6 +423,7 @@ void createPlayerList(Word **headPlayer, Word **tailPlayer, int lenght) {
     }
 }
 
+// Verifica se a palavra do jogador está igual à secreta
 bool isPlayerListCorrect(Word *headSecret, Word *headPlayer) {
     if(headSecret != NULL && headPlayer != NULL) {
         while(headSecret != NULL && headPlayer != NULL && headSecret->letter == headPlayer->letter) {
@@ -430,6 +437,7 @@ bool isPlayerListCorrect(Word *headSecret, Word *headPlayer) {
     return false;
 }
 
+// Converte letra minúscula para maiúscula
 char toUppercase(char letter) {
     if (letter >= 'a' && letter <= 'z') {
         return letter - 32;
@@ -438,6 +446,7 @@ char toUppercase(char letter) {
     return letter;
 }
 
+// Retorna índices onde a letra aparece na palavra secreta
 int* checkLetterInSecret(Word *headSecret, char letter) {
     int *indexes = (int*)malloc(sizeof(int) * (WORD_SIZE + 1));
     if(indexes == NULL) return NULL;
@@ -453,11 +462,12 @@ int* checkLetterInSecret(Word *headSecret, char letter) {
         headSecret = headSecret->next;
     }
 
-    indexes[i] = -1;
+    indexes[i] = -1; // marca final do array
 
     return indexes;
 }
 
+// Atualiza as letras corretas na palavra do jogador
 void addPlayerList(Word **headPlayer, int *indexes, char letter) {
     if (*headPlayer == NULL || indexes == NULL) return;
 
@@ -474,6 +484,7 @@ void addPlayerList(Word **headPlayer, int *indexes, char letter) {
     }
 }
 
+// Verifica se a letra já foi usada (está na pilha)
 bool checkLetterInStack(NodeStack *headStack, char letter) {
     while(headStack != NULL) {
         if(headStack->letter == letter) {
@@ -486,6 +497,7 @@ bool checkLetterInStack(NodeStack *headStack, char letter) {
     return false;
 }
 
+// Insere letra na pilha
 void push(NodeStack **headStack, char letter){
     NodeStack *new = (NodeStack*)malloc(sizeof(NodeStack));
 
@@ -502,6 +514,7 @@ void push(NodeStack **headStack, char letter){
     }
 }
 
+// Ordena a pilha de letras em ordem alfabética (insertion sort)
 void insertionSort(NodeStack **head) {
     if(*head != NULL) {
         NodeStack *aux1 = (*head)->next;
