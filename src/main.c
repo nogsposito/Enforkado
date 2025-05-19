@@ -57,15 +57,6 @@ int main() {
     ColorMode modoAtual = LIGHTMODE;
     Rectangle botaoDarkMode = { largura / 2 - 100, altura / 2 + 50, 200, 50 };
 
-    Word *headGemini = NULL;
-    Word *tailGemini = NULL;
-    Word *headPlayer = NULL;
-    Word *tailPlayer = NULL;
-    NodeStack *headStack = NULL;
-
-    int vidas = 5;
-    bool palavraCompleta = false;
-
     char *ingredientes[NUM_INGREDIENTS];
 
     Word *headSecret = NULL;
@@ -85,10 +76,8 @@ int main() {
     addSecretIngredient(&headSecret, &tailSecret, ingredientes[palavraAtual]);
     createPlayerList(&headPlayer, &tailPlayer, tailSecret->index);
 
-    InitWindow(width, height, "Enforkado");
+    InitWindow(largura, altura, "Enforkado");
     SetTargetFPS(60);
-
-    GameScreen telaAtual = FASE;
 
     while (!WindowShouldClose()) {
 
@@ -160,13 +149,8 @@ int main() {
 
             // Mostra vidas
             char vidasTexto[20];
-<<<<<<< HEAD
             sprintf(vidasTexto, "Vidas: %d", lives);
-            DrawText(vidasTexto, 20, 220, 20, BLUE);
-=======
-            sprintf(vidasTexto, "Vidas: %d", vidas);
             DrawText(vidasTexto, 20, 220, 20, corVidas);
->>>>>>> c175fb9a59c83ad9dc024db3494ef61dd756d602
 
             // Entrada de teclado
             int key = toUppercase(GetCharPressed());
@@ -232,15 +216,9 @@ int main() {
                         telaAtual = GAMEOVER;
                     }
                 }
-<<<<<<< HEAD
             } else if (lives == 0) {
-                DrawText("Suas vidas acabaram!", 20, 300, 30, MAROON);
-                DrawText("Pressione ENTER para continuar", 20, 340, 20, DARKGRAY);
-=======
-            } else if (vidas == 0) {
                 DrawText("Suas vidas acabaram!", 20, 300, 30, corErro);
                 DrawText("Pressione ENTER para continuar", 20, 340, 20, corTexto);
->>>>>>> c175fb9a59c83ad9dc024db3494ef61dd756d602
                 // Aguarda a tecla ENTER para ir para GAMEOVER
                 if (IsKeyPressed(KEY_ENTER)) {
                     telaAtual = GAMEOVER;
