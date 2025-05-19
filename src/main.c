@@ -8,6 +8,9 @@
 #define NUM_INGREDIENTS 10
 #define WORD_SIZE 51
 
+typedef enum { MENU, GAME, GAMEOVER } GameScreen;
+typedef enum { LIGHTTHEME, DARKTHEME } ColorMode;
+
 typedef struct MemoryStruct {
     char *buffer;
     size_t size;
@@ -28,9 +31,6 @@ typedef struct NodeStack{
     struct NodeStack *prev;
 } NodeStack;
 
-typedef enum { MENU, FASE, GAMEOVER } GameScreen;
-typedef enum { LIGHTMODE, DARKMODE } ColorMode;
-
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 char* geminiWordGenerator(const char *prompt);
 void stringToArray(char *ingredients, char *ingredientArray[NUM_INGREDIENTS]);
@@ -45,101 +45,99 @@ void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
 
 int main() {
-    const int largura = 800;
-    const int altura = 600;
-
-    GameScreen telaAtual = MENU;
-    Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
-
-    ColorMode modoAtual = LIGHTMODE;
-    Rectangle botaoDarkMode = { largura / 2 - 100, altura / 2 + 50, 200, 50 };
-
-    char *ingredientes[NUM_INGREDIENTS];
+    char *ingredients[NUM_INGREDIENTS];
 
     Word *headSecret = NULL;
     Word *tailSecret = NULL;
     Word *headPlayer = NULL;
     Word *tailPlayer = NULL;
 
+    const int width = 800;
+    const int height = 600;
+
+    GameScreen currentScreen = MENU;
+
+    ColorMode currentTheme = LIGHTTHEME;
+
+    Rectangle button = { width / 2 - 100, height / 2 - 25, 200, 50 };
+    Rectangle darkThemeButton = { width / 2 - 100, height / 2 + 50, 200, 50 };
+
     NodeStack *headStack = NULL;
 
     int lives = 5;
+
     bool palavraCompleta = false;
 
-    char *resposta = geminiWordGenerator("Gere exatamente 10 ingredientes típicos para uma receita em português brasileiro. - As palavras devem ser todas em MAIÚSCULAS. Apenas caracteres A-Z, sem acentos, cedilha ou símbolos especiais. Separe os ingredientes com UM espaço apenas. NÃO USE palavras estrangeiras ou espanholas como AZUCAR. Use apenas palavras do português brasileiro. Por exemplo, use ACUCAR. Não adicione nenhuma explicação ou texto extra. Apenas a lista das 10 palavras.");
-    stringToArray(resposta, ingredientes);
+    char *ingredientsString = geminiWordGenerator("Gere exatamente 10 ingredientes típicos para uma receita em português brasileiro. - As palavras devem ser todas em MAIÚSCULAS. Apenas caracteres A-Z, sem acentos, cedilha ou símbolos especiais. Separe os ingredientes com UM espaço apenas. NÃO USE palavras estrangeiras ou espanholas como AZUCAR. Use apenas palavras do português brasileiro. Por exemplo, use ACUCAR. Não adicione nenhuma explicação ou texto extra. Apenas a lista das 10 palavras.");
+    stringToArray(ingredientsString, ingredients);
 
     int palavraAtual = 0;
-    addSecretIngredient(&headSecret, &tailSecret, ingredientes[palavraAtual]);
+    addSecretIngredient(&headSecret, &tailSecret, ingredients[palavraAtual]);
     createPlayerList(&headPlayer, &tailPlayer, tailSecret->index);
 
-    InitWindow(largura, altura, "Enforkado");
+    InitWindow(width, height, "Enforkado");
     SetTargetFPS(60);
 
-    while (!WindowShouldClose()) {
-
-        Color corDeFundo = (modoAtual == LIGHTMODE) ? RAYWHITE : (Color){30, 30, 30, 255};
-        Color corTexto = (modoAtual == LIGHTMODE) ? BLACK : RAYWHITE;
-        Color corBotao = (modoAtual == LIGHTMODE) ? LIGHTGRAY : DARKGRAY;
-        Color corTitulo = (modoAtual == LIGHTMODE) ? DARKGRAY : RAYWHITE;
-        Color corVidas = (modoAtual == LIGHTMODE) ? RED : RED;
-        Color corAcerto = (modoAtual == LIGHTMODE) ? DARKGREEN : GREEN;
-        Color corErro = (modoAtual == LIGHTMODE) ? RED : RED;
+    while(!WindowShouldClose()) {
+        Color backgroundColor = (currentTheme == LIGHTTHEME) ? RAYWHITE : (Color){30, 30, 30, 255};
+        Color textColor = (currentTheme == LIGHTTHEME) ? BLACK : RAYWHITE;
+        Color buttonColor = (currentTheme == LIGHTTHEME) ? LIGHTGRAY : DARKGRAY;
+        Color titleColor = (currentTheme == LIGHTTHEME) ? DARKGRAY : RAYWHITE;
+        Color livesColor = (currentTheme == LIGHTTHEME) ? RED : RED;
+        Color correctColor = (currentTheme == LIGHTTHEME) ? DARKGREEN : GREEN;
+        Color wrongColor = (currentTheme == LIGHTTHEME) ? RED : RED;
 
         BeginDrawing();
-        ClearBackground(corDeFundo);
+        ClearBackground(backgroundColor);
 
-        if (telaAtual == MENU){
+        if(currentScreen == MENU){
+            DrawText("Bem vindo ao Enforkado!", width / 2 - MeasureText("Bem vindo ao Enforkado!", 20) / 2, 100, 20, titleColor);
 
-            // CHECA CLIQUES NOS BOTOES
-            if (CheckCollisionPointRec(GetMousePosition(), botao) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                telaAtual = FASE;
-            }
-            if (CheckCollisionPointRec(GetMousePosition(), botaoDarkMode) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                modoAtual = (modoAtual == LIGHTMODE) ? DARKMODE : LIGHTMODE;
-            }
+            DrawRectangleRec(button, buttonColor);
+            DrawText("Começar", width / 2 - MeasureText("Começar", 20) / 2, height / 2 - 10, 20, BLACK);
 
-            DrawText("BEM VINDO AO ENFORKADO", largura / 2 - MeasureText("BEM VINDO AO ENFORKADO", 20) / 2, 100, 20, corTitulo);
-            
-            // BOTAO DE PLAY:
-            DrawRectangleRec(botao, corBotao);
-            if (CheckCollisionPointRec(GetMousePosition(), botao)) {
-                DrawRectangleLinesEx(botao, 2, RED);
+            DrawRectangleRec(darkThemeButton, buttonColor);
+            DrawText(currentTheme == LIGHTTHEME ? "Modo Escuro" : "Modo Claro", width / 2 - MeasureText("Modo Escuro", 20) / 2, height / 2 + 65, 20, BLACK);
+
+            if (CheckCollisionPointRec(GetMousePosition(), button)) {
+                DrawRectangleLinesEx(button, 2, RED);
+
+                if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    currentScreen = GAME;
+                }
             } else {
-                DrawRectangleLinesEx(botao, 2, BLACK);
+                DrawRectangleLinesEx(button, 2, BLACK);
             }
 
-            // BOTAO DE DARK MODE:
-            DrawRectangleRec(botaoDarkMode, corBotao);
-            if (CheckCollisionPointRec(GetMousePosition(), botaoDarkMode)) {
-                DrawRectangleLinesEx(botaoDarkMode, 2, RED);
+            if (CheckCollisionPointRec(GetMousePosition(), darkThemeButton)) {
+                DrawRectangleLinesEx(darkThemeButton, 2, RED);
+
+                if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    currentTheme = (currentTheme == LIGHTTHEME) ? DARKTHEME : LIGHTTHEME;
+                }
             } else {
-                DrawRectangleLinesEx(botaoDarkMode, 2, BLACK);
+                DrawRectangleLinesEx(darkThemeButton, 2, BLACK);
             }
-
-            DrawText(modoAtual == LIGHTMODE ? "Modo Escuro" : "Modo Claro", largura / 2 - MeasureText("Modo Escuro", 20) / 2, altura / 2 + 65, 20, BLACK);
-            DrawText("Começar jogo", largura / 2 - MeasureText("Começar jogo", 20) / 2, altura / 2 - 10, 20, BLACK);
-
-        } else if (telaAtual == FASE) {
-            DrawText("Acerte o ingrediente secreto!", 20, 20, 20, corTexto);
+        } else if (currentScreen == GAME) {
+            DrawText("Acerte o ingrediente secreto!", 20, 20, 20, textColor);
 
             // Desenha letras da palavra
             Word *temp = headPlayer;
             int x = 40;
             while (temp != NULL) {
                 char letra[2] = { temp->letter, '\0' };
-                DrawText(letra, x, 100, 40, corTexto);
+                DrawText(letra, x, 100, 40, textColor);
                 x += 45;
                 temp = temp->next;
             }
 
             // Desenha letras erradas
-            DrawText("Letras erradas:", 20, 180, 20, corTexto);
+            DrawText("Letras erradas:", 20, 180, 20, textColor);
             NodeStack *erro = headStack;
             int xErro = 200;
             while (erro != NULL) {
                 char letra[2] = { erro->letter, '\0' };
-                DrawText(letra, xErro, 180, 20, corErro);
+                DrawText(letra, xErro, 180, 20, wrongColor);
                 xErro += 25;
                 erro = erro->next;
             }
@@ -147,7 +145,7 @@ int main() {
             // Mostra vidas
             char vidasTexto[20];
             sprintf(vidasTexto, "Vidas: %d", lives);
-            DrawText(vidasTexto, 20, 220, 20, corVidas);
+            DrawText(vidasTexto, 20, 220, 20, livesColor);
 
             // Entrada de teclado
             int key = toUppercase(GetCharPressed());
@@ -168,8 +166,8 @@ int main() {
 
             if (isPlayerListCorrect(headSecret, headPlayer)) {
                 palavraCompleta = true;
-                DrawText("Voce acertou!", 20, 300, 30, corAcerto);
-                DrawText("Pressione ENTER para continuar", 20, 340, 20, corTexto);
+                DrawText("Voce acertou!", 20, 300, 30, correctColor);
+                DrawText("Pressione ENTER para continuar", 20, 340, 20, textColor);
 
                 // Aguarda a tecla ENTER para avançar para a próxima palavra
                 if (IsKeyPressed(KEY_ENTER)) {
@@ -202,28 +200,28 @@ int main() {
 
                     // Avança para a próxima palavra
                     palavraAtual++;
-                    if (palavraAtual < NUM_INGREDIENTS && ingredientes[palavraAtual] != NULL) {
+                    if (palavraAtual < NUM_INGREDIENTS && ingredients[palavraAtual] != NULL) {
                         // Reinicia o estado do jogo
-                        addSecretIngredient(&headSecret, &tailSecret, ingredientes[palavraAtual]);
+                        addSecretIngredient(&headSecret, &tailSecret, ingredients[palavraAtual]);
                         createPlayerList(&headPlayer, &tailPlayer, tailSecret->index);
                         lives = 5;
                         palavraCompleta = false;
                     } else {
                         // Todas as palavras foram completadas
-                        telaAtual = GAMEOVER;
+                        currentScreen = GAMEOVER;
                     }
                 }
             } else if (lives == 0) {
-                DrawText("Suas vidas acabaram!", 20, 300, 30, corErro);
-                DrawText("Pressione ENTER para continuar", 20, 340, 20, corTexto);
+                DrawText("Suas vidas acabaram!", 20, 300, 30, wrongColor);
+                DrawText("Pressione ENTER para continuar", 20, 340, 20, textColor);
                 // Aguarda a tecla ENTER para ir para GAMEOVER
                 if (IsKeyPressed(KEY_ENTER)) {
-                    telaAtual = GAMEOVER;
+                    currentScreen = GAMEOVER;
                 }
             }
-        } else if (telaAtual == GAMEOVER) {
-            DrawText("Fim de Jogo!", 20, 300, 30, corErro);
-            DrawText("Pressione ENTER para nova partida ou ESC para sair", 20, 350, 20, corTexto);
+        } else if (currentScreen == GAMEOVER) {
+            DrawText("Fim de Jogo!", 20, 300, 30, wrongColor);
+            DrawText("Pressione ENTER para nova partida ou ESC para sair", 20, 350, 20, textColor);
 
             if (IsKeyPressed(KEY_ENTER)) {
                 // Libera as listas atuais
@@ -255,31 +253,31 @@ int main() {
 
                 // Libera o array de palavras anterior
                 for (int i = 0; i < NUM_INGREDIENTS; i++) {
-                    if (ingredientes[i] != NULL) {
-                        free(ingredientes[i]);
-                        ingredientes[i] = NULL;
+                    if (ingredients[i] != NULL) {
+                        free(ingredients[i]);
+                        ingredients[i] = NULL;
                     }
                 }
-                if (resposta != NULL) {
-                    free(resposta);
-                    resposta = NULL;
+                if (ingredientsString != NULL) {
+                    free(ingredientsString);
+                    ingredientsString = NULL;
                 }
 
                 // Gera uma nova lista de palavras
-                resposta = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
-                if (resposta == NULL) {
-                    DrawText("Erro ao carregar palavras!", 20, 400, 20, corErro);
+                ingredientsString = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
+                if (ingredientsString == NULL) {
+                    DrawText("Erro ao carregar palavras!", 20, 400, 20, wrongColor);
                     continue;
                 }
-                stringToArray(resposta, ingredientes);
+                stringToArray(ingredientsString, ingredients);
 
                 // Reinicia o estado do jogo
                 palavraAtual = 0;
-                addSecretIngredient(&headSecret, &tailSecret, ingredientes[palavraAtual]);
+                addSecretIngredient(&headSecret, &tailSecret, ingredients[palavraAtual]);
                 createPlayerList(&headPlayer, &tailPlayer, tailSecret->index);
                 lives = 5;
                 palavraCompleta = false;
-                telaAtual = MENU;
+                currentScreen = MENU;
             }
         }
 
@@ -306,9 +304,9 @@ int main() {
         tempStack = next;
     }
     for (int i = 0; i < NUM_INGREDIENTS; i++) {
-        if (ingredientes[i] != NULL) free(ingredientes[i]);
+        if (ingredients[i] != NULL) free(ingredients[i]);
     }
-    if (resposta != NULL) free(resposta);
+    if (ingredientsString != NULL) free(ingredientsString);
 
     CloseWindow();
 
