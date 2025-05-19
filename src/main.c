@@ -55,6 +55,8 @@ int main() {
     Word *headPlayer = NULL;
     Word *tailPlayer = NULL;
 
+    int currentIngredientIndex = 0;
+
     const int width = 800;
     const int height = 600;
 
@@ -69,13 +71,10 @@ int main() {
 
     int lives = 5;
 
-    bool palavraCompleta = false;
-
     char *ingredientsString = geminiWordGenerator("Gere exatamente 10 ingredientes típicos para uma receita em português brasileiro. - As palavras devem ser todas em MAIÚSCULAS. Apenas caracteres A-Z, sem acentos, cedilha ou símbolos especiais. Separe os ingredientes com UM espaço apenas. NÃO USE palavras estrangeiras ou espanholas como AZUCAR. Use apenas palavras do português brasileiro. Por exemplo, use ACUCAR. Não adicione nenhuma explicação ou texto extra. Apenas a lista das 10 palavras.");
     stringToArray(ingredientsString, ingredients);
 
-    int palavraAtual = 0;
-    addSecretIngredient(&headSecret, &tailSecret, ingredients[palavraAtual]);
+    addSecretIngredient(&headSecret, &tailSecret, ingredients[currentIngredientIndex]);
     createPlayerList(&headPlayer, &tailPlayer, tailSecret->index);
 
     InitWindow(width, height, "Enforkado");
@@ -152,7 +151,7 @@ int main() {
 
             // Entrada de teclado
             int key = toUppercase(GetCharPressed());
-            if (key >= 'A' && key <= 'Z' && lives > 0 && !palavraCompleta) {
+            if (key >= 'A' && key <= 'Z' && lives > 0 && !isPlayerListCorrect(headSecret, headPlayer)) {
                 char letra = (char)key;
                 int *indexes = checkLetterInSecret(headSecret, letra);
                 if (indexes != NULL && indexes[0] != -1) {
@@ -168,47 +167,23 @@ int main() {
             }
 
             if (isPlayerListCorrect(headSecret, headPlayer)) {
-                palavraCompleta = true;
                 DrawText("Voce acertou!", 20, 300, 30, correctColor);
                 DrawText("Pressione ENTER para continuar", 20, 340, 20, textColor);
 
                 // Aguarda a tecla ENTER para avançar para a próxima palavra
                 if (IsKeyPressed(KEY_ENTER)) {
                     // Libera as listas atuais
-                    Word *temp = headSecret;
-                    while (temp != NULL) {
-                        Word *next = temp->next;
-                        free(temp);
-                        temp = next;
-                    }
-                    headSecret = NULL;
-                    tailSecret = NULL;
-
-                    temp = headPlayer;
-                    while (temp != NULL) {
-                        Word *next = temp->next;
-                        free(temp);
-                        temp = next;
-                    }
-                    headPlayer = NULL;
-                    tailPlayer = NULL;
-
-                    NodeStack *tempStack = headStack;
-                    while (tempStack != NULL) {
-                        NodeStack *next = tempStack->next;
-                        free(tempStack);
-                        tempStack = next;
-                    }
-                    headStack = NULL;
+                    freeWordList(&headSecret, &tailSecret);
+                    freeWordList(&headPlayer, &tailPlayer);
+                    freeNodeStackList(&headStack);
 
                     // Avança para a próxima palavra
-                    palavraAtual++;
-                    if (palavraAtual < NUM_INGREDIENTS && ingredients[palavraAtual] != NULL) {
+                    currentIngredientIndex++;
+                    if (currentIngredientIndex < NUM_INGREDIENTS && ingredients[currentIngredientIndex] != NULL) {
                         // Reinicia o estado do jogo
-                        addSecretIngredient(&headSecret, &tailSecret, ingredients[palavraAtual]);
+                        addSecretIngredient(&headSecret, &tailSecret, ingredients[currentIngredientIndex]);
                         createPlayerList(&headPlayer, &tailPlayer, tailSecret->index);
                         lives = 5;
-                        palavraCompleta = false;
                     } else {
                         // Todas as palavras foram completadas
                         currentScreen = GAMEOVER;
@@ -217,6 +192,7 @@ int main() {
             } else if (lives == 0) {
                 DrawText("Suas vidas acabaram!", 20, 300, 30, wrongColor);
                 DrawText("Pressione ENTER para continuar", 20, 340, 20, textColor);
+
                 // Aguarda a tecla ENTER para ir para GAMEOVER
                 if (IsKeyPressed(KEY_ENTER)) {
                     currentScreen = GAMEOVER;
@@ -239,6 +215,7 @@ int main() {
                         ingredients[i] = NULL;
                     }
                 }
+
                 if (ingredientsString != NULL) {
                     free(ingredientsString);
                     ingredientsString = NULL;
@@ -249,12 +226,12 @@ int main() {
                 stringToArray(ingredientsString, ingredients);
 
                 // Reinicia o estado do jogo
-                palavraAtual = 0;
-                addSecretIngredient(&headSecret, &tailSecret, ingredients[palavraAtual]);
-                createPlayerList(&headPlayer, &tailPlayer, tailSecret->index);
-                lives = 5;
-                palavraCompleta = false;
+                currentIngredientIndex = 0;
                 currentScreen = MENU;
+                lives = 5;
+
+                addSecretIngredient(&headSecret, &tailSecret, ingredients[currentIngredientIndex]);
+                createPlayerList(&headPlayer, &tailPlayer, tailSecret->index);
             }
         }
 
@@ -538,7 +515,7 @@ void insertionSort(NodeStack **head) {
 }
 
 void freeWordList(Word **head, Word **tail) {
-    Word *aux = head;
+    Word *aux = *head;
 
     while(aux != NULL) {
         Word *next = aux->next;
@@ -551,7 +528,7 @@ void freeWordList(Word **head, Word **tail) {
 }
 
 void freeNodeStackList(NodeStack **head) {
-    NodeStack *aux = head;
+    NodeStack *aux = *head;
 
     while(aux != NULL) {
         NodeStack *next = aux->next;
