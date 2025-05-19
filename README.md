@@ -69,9 +69,9 @@ O código do jogo está inteiramente em um arquivo (Excluindo suas dependências
 
 ### Enums criados
 
-- GameScreen: Determina a tela que está em disposição para o jogador, podendo ser MENU, FASE ou GAMEOVER.
+- GameScreen: Determina a tela que está em disposição para o jogador, podendo ser MENU, GAME ou GAMEOVER.
 
-- ColorMode: Determina o modo em que o jogador está jogando o jogo. sendo LIGHTMODE para modo claro ou DARKMODE para escuro.
+- ColorMode: Determina o tema em que o jogador está jogando o jogo. Sendo LIGHTTHEME para o tema claro ou DARKTHEME para escuro.
 
 ### Funções Criadas:
 
