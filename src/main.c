@@ -11,6 +11,7 @@
 typedef enum { MENU, GAME, GAMEOVER } GameScreen;
 typedef enum { LIGHTTHEME, DARKTHEME } ColorMode;
 
+// Serve para execução de funções para as requisições do Gemini.
 typedef struct MemoryStruct {
     char *buffer;
     size_t size;
@@ -43,6 +44,8 @@ void addPlayerList(Word **headPlayer, int *indexes, char letter);
 bool checkLetterInStack(NodeStack *headStack, char letter);
 void push(NodeStack **headStack, char letter);
 void insertionSort(NodeStack **head);
+void freeWordList(Word **head, Word **tail);
+void freeNodeStackList(NodeStack **head);
 
 int main() {
     char *ingredients[NUM_INGREDIENTS];
@@ -99,7 +102,7 @@ int main() {
             DrawRectangleRec(darkThemeButton, buttonColor);
             DrawText(currentTheme == LIGHTTHEME ? "Modo Escuro" : "Modo Claro", width / 2 - MeasureText("Modo Escuro", 20) / 2, height / 2 + 65, 20, BLACK);
 
-            if (CheckCollisionPointRec(GetMousePosition(), button)) {
+            if(CheckCollisionPointRec(GetMousePosition(), button)) {
                 DrawRectangleLinesEx(button, 2, RED);
 
                 if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -109,7 +112,7 @@ int main() {
                 DrawRectangleLinesEx(button, 2, BLACK);
             }
 
-            if (CheckCollisionPointRec(GetMousePosition(), darkThemeButton)) {
+            if(CheckCollisionPointRec(GetMousePosition(), darkThemeButton)) {
                 DrawRectangleLinesEx(darkThemeButton, 2, RED);
 
                 if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -118,7 +121,7 @@ int main() {
             } else {
                 DrawRectangleLinesEx(darkThemeButton, 2, BLACK);
             }
-        } else if (currentScreen == GAME) {
+        } else if(currentScreen == GAME) {
             DrawText("Acerte o ingrediente secreto!", 20, 20, 20, textColor);
 
             // Desenha letras da palavra
@@ -225,31 +228,9 @@ int main() {
 
             if (IsKeyPressed(KEY_ENTER)) {
                 // Libera as listas atuais
-                Word *temp = headSecret;
-                while (temp != NULL) {
-                    Word *next = temp->next;
-                    free(temp);
-                    temp = next;
-                }
-                headSecret = NULL;
-                tailSecret = NULL;
-
-                temp = headPlayer;
-                while (temp != NULL) {
-                    Word *next = temp->next;
-                    free(temp);
-                    temp = next;
-                }
-                headPlayer = NULL;
-                tailPlayer = NULL;
-
-                NodeStack *tempStack = headStack;
-                while (tempStack != NULL) {
-                    NodeStack *next = tempStack->next;
-                    free(tempStack);
-                    tempStack = next;
-                }
-                headStack = NULL;
+                freeWordList(&headSecret, &tailSecret);
+                freeWordList(&headPlayer, &tailPlayer);
+                freeNodeStackList(&headStack);
 
                 // Libera o array de palavras anterior
                 for (int i = 0; i < NUM_INGREDIENTS; i++) {
@@ -265,10 +246,6 @@ int main() {
 
                 // Gera uma nova lista de palavras
                 ingredientsString = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
-                if (ingredientsString == NULL) {
-                    DrawText("Erro ao carregar palavras!", 20, 400, 20, wrongColor);
-                    continue;
-                }
                 stringToArray(ingredientsString, ingredients);
 
                 // Reinicia o estado do jogo
@@ -284,31 +261,12 @@ int main() {
         EndDrawing();
     }
 
-    // Libera memória restante
-    Word *temp = headSecret;
-    while (temp != NULL) {
-        Word *next = temp->next;
-        free(temp);
-        temp = next;
-    }
-    temp = headPlayer;
-    while (temp != NULL) {
-        Word *next = temp->next;
-        free(temp);
-        temp = next;
-    }
-    NodeStack *tempStack = headStack;
-    while (tempStack != NULL) {
-        NodeStack *next = tempStack->next;
-        free(tempStack);
-        tempStack = next;
-    }
-    for (int i = 0; i < NUM_INGREDIENTS; i++) {
-        if (ingredients[i] != NULL) free(ingredients[i]);
-    }
-    if (ingredientsString != NULL) free(ingredientsString);
-
     CloseWindow();
+
+    // Libera memória restante
+    freeWordList(&headSecret, &tailSecret);
+    freeWordList(&headPlayer, &tailPlayer);
+    freeNodeStackList(&headStack);
 
     return 0;
 }
@@ -577,4 +535,29 @@ void insertionSort(NodeStack **head) {
             aux1 = aux1->next;
         }
     } 
+}
+
+void freeWordList(Word **head, Word **tail) {
+    Word *aux = head;
+
+    while(aux != NULL) {
+        Word *next = aux->next;
+        free(aux);
+        aux = next;
+    }
+
+    *head = NULL;
+    *tail = NULL;
+}
+
+void freeNodeStackList(NodeStack **head) {
+    NodeStack *aux = head;
+
+    while(aux != NULL) {
+        NodeStack *next = aux->next;
+        free(aux);
+        aux = next;
+    }
+
+    *head = NULL;
 }
