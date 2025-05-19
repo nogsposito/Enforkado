@@ -227,11 +227,12 @@ int main() {
 
                 // Reinicia o estado do jogo
                 currentIngredientIndex = 0;
-                currentScreen = MENU;
                 lives = 5;
 
                 addSecretIngredient(&headSecret, &tailSecret, ingredients[currentIngredientIndex]);
                 createPlayerList(&headPlayer, &tailPlayer, tailSecret->index);
+
+                currentScreen = MENU;
             }
         }
 
