@@ -33,7 +33,7 @@ Supondo que você já tenha as dependências do Raylib e Curl para o Gemini inst
 
 1. Ir ao terminal do seu PC e rodar o comanndo `git clone https://github.com/nogsposito/Enforkado` para clonar o repositório em sua máquina
    
-2. Entrar no diretório do projeto (Pod-se fazer com `cd Enforkado/` (Atente-se que alguns comandos podem variar dependendo do seu Sistema Operacional)
+2. Entrar no diretório do projeto (Pode-se fazer com `cd Enforkado/` (Atente-se que alguns comandos podem variar dependendo do seu Sistema Operacional)
    
 3. Quando estiver dentro do diretório, rodar o comando `make` para compilar o código, por meio da Makefile do projeto.
    
@@ -69,9 +69,9 @@ O código do jogo está inteiramente em um arquivo (Excluindo suas dependências
 
 ### Enums criados
 
-- GameScreen: Determina a tela que está em disposição para o jogador, podendo ser MENU, FASE ou GAMEOVER.
+- GameScreen: Determina a tela que está em disposição para o jogador, podendo ser MENU, GAME ou GAMEOVER.
 
-- ColorMode: Determina o modo em que o jogador está jogando o jogo. sendo LIGHTMODE para modo claro ou DARKMODE para escuro.
+- ColorMode: Determina o tema em que o jogador está jogando o jogo. Sendo LIGHTTHEME para o tema claro ou DARKTHEME para escuro.
 
 ### Funções Criadas:
 
