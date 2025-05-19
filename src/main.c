@@ -48,9 +48,6 @@ int main() {
     const int largura = 800;
     const int altura = 600;
 
-    InitWindow(largura, altura, "Enforkado");
-    SetTargetFPS(60);
-
     GameScreen telaAtual = MENU;
     Rectangle botao = { largura / 2 - 100, altura / 2 - 25, 200, 50 };
 
