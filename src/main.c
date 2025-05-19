@@ -222,7 +222,7 @@ int main() {
                 }
 
                 // Gera uma nova lista de palavras
-                ingredientsString = geminiWordGenerator("Retorne 10 ingredientes para uma receita específica, sem instruções, sem pontuação, sem caracteres especiais e separados por espaços. Apenas palavras simples como 'Leite', 'Ovo' ou 'Queijo' que façam uma receita (EM MAIUSCULO)");
+                ingredientsString = geminiWordGenerator("Gere exatamente 10 ingredientes típicos para uma receita em português brasileiro. - As palavras devem ser todas em MAIÚSCULAS. Apenas caracteres A-Z, sem acentos, cedilha ou símbolos especiais. Separe os ingredientes com UM espaço apenas. NÃO USE palavras estrangeiras ou espanholas como AZUCAR. Use apenas palavras do português brasileiro. Por exemplo, use ACUCAR. Não adicione nenhuma explicação ou texto extra. Apenas a lista das 10 palavras.");
                 stringToArray(ingredientsString, ingredients);
 
                 // Reinicia o estado do jogo
